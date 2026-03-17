@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Community - FloraPulse</title>
+    <link rel="stylesheet" href="src/index.css">
+    <style>
+        /* Hide scrollbar for horizontal scrolling */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="bg-rose-50 dark:bg-slate-900 min-h-screen flex flex-col items-center py-6 px-4 transition-colors duration-200">
+    <div class="w-full max-w-[480px] md:max-w-2xl mx-auto flex-grow flex flex-col relative">
+        
+        <!-- Header -->
+        <div class="w-full flex justify-between items-center mb-6">
+            <a href="index.html" class="text-slate-500 hover:text-rose-500 dark:text-slate-400 dark:hover:text-rose-400 font-medium transition-colors flex items-center gap-1">
+                &larr; Back to Home
+            </a>
+            <button onclick="toggleTheme()" class="text-slate-500 hover:text-rose-500 dark:text-slate-400 dark:hover:text-rose-400 transition-colors p-2 rounded-full hover:bg-rose-100/50 dark:hover:bg-slate-800" aria-label="Toggle Dark Mode">
+                <svg class="w-5 h-5 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                <svg class="w-5 h-5 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+            </button>
+        </div>
+
+        <header class="text-center mb-6">
+            <h1 class="text-3xl font-bold text-rose-500 dark:text-rose-400 mb-2 tracking-tight">Community</h1>
+            <p class="text-slate-600 dark:text-slate-300">Connect with other women</p>
+        </header>
+
+        <!-- Category Filter Tabs -->
+        <div class="w-full overflow-x-auto no-scrollbar mb-6 pb-2">
+            <div class="flex gap-2 min-w-max px-1" id="categoryTabs">
+                <button onclick="filterPosts('All')" class="category-tab active px-4 py-2 rounded-full text-sm font-medium bg-rose-500 text-white transition-colors" data-category="All">All</button>
+                <button onclick="filterPosts('General')" class="category-tab px-4 py-2 rounded-full text-sm font-medium bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-rose-100 dark:border-slate-700 hover:bg-rose-50 dark:hover:bg-slate-700 transition-colors" data-category="General">General</button>
+                <button onclick="filterPosts('Cycle Questions')" class="category-tab px-4 py-2 rounded-full text-sm font-medium bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-rose-100 dark:border-slate-700 hover:bg-rose-50 dark:hover:bg-slate-700 transition-colors" data-category="Cycle Questions">Cycle Questions</button>
+                <button onclick="filterPosts('Pregnancy')" class="category-tab px-4 py-2 rounded-full text-sm font-medium bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-rose-100 dark:border-slate-700 hover:bg-rose-50 dark:hover:bg-slate-700 transition-colors" data-category="Pregnancy">Pregnancy</button>
+                <button onclick="filterPosts('Symptoms')" class="category-tab px-4 py-2 rounded-full text-sm font-medium bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-rose-100 dark:border-slate-700 hover:bg-rose-50 dark:hover:bg-slate-700 transition-colors" data-category="Symptoms">Symptoms</button>
+                <button onclick="filterPosts('Wellness Tips')" class="category-tab px-4 py-2 rounded-full text-sm font-medium bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-rose-100 dark:border-slate-700 hover:bg-rose-50 dark:hover:bg-slate-700 transition-colors" data-category="Wellness Tips">Wellness Tips</button>
+            </div>
+        </div>
+
+        <!-- Post Feed -->
+        <div id="postFeed" class="flex flex-col gap-4 mb-24">
+            <!-- Posts will be injected here -->
+        </div>
+
+        <!-- Floating Action Button -->
+        <button onclick="openCreatePostModal()" class="fixed bottom-6 right-6 md:right-auto md:left-1/2 md:ml-[150px] lg:ml-[200px] bg-rose-500 hover:bg-rose-600 text-white rounded-full py-3 px-6 shadow-lg hover:shadow-xl transition-all font-medium flex items-center gap-2 z-10">
+            <span>Ask the Community</span>
+            <span class="text-xl leading-none">+</span>
+        </button>
+
+    </div>
+
+    <!-- Create Post Modal -->
+    <div id="createPostModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4 opacity-0 transition-opacity duration-300">
+        <div class="bg-white dark:bg-slate-800 w-full max-w-md rounded-2xl shadow-xl overflow-hidden transform scale-95 transition-transform duration-300 flex flex-col max-h-[90vh]">
+            <div class="p-4 border-b border-rose-100 dark:border-slate-700 flex justify-between items-center bg-rose-50 dark:bg-slate-800/50">
+                <h2 class="text-lg font-bold text-slate-800 dark:text-slate-100">Create a Post</h2>
+                <button onclick="closeCreatePostModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-2xl leading-none">&times;</button>
+            </div>
+            
+            <div class="p-5 overflow-y-auto">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Category</label>
+                    <select id="newPostCategory" class="w-full p-3 rounded-xl border border-rose-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-rose-500">
+                        <option value="General">General</option>
+                        <option value="Cycle Questions">Cycle Questions</option>
+                        <option value="Pregnancy">Pregnancy</option>
+                        <option value="Symptoms">Symptoms</option>
+                        <option value="Wellness Tips">Wellness Tips</option>
+                    </select>
+                </div>
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Title</label>
+                    <input type="text" id="newPostTitle" placeholder="What's on your mind?" class="w-full p-3 rounded-xl border border-rose-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-rose-500">
+                </div>
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Message</label>
+                    <textarea id="newPostBody" rows="4" placeholder="Share your thoughts, questions, or experiences..." class="w-full p-3 rounded-xl border border-rose-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-rose-500 resize-none"></textarea>
+                </div>
+                
+                <div class="flex items-center justify-between mb-6 bg-slate-50 dark:bg-slate-700/50 p-3 rounded-xl">
+                    <div>
+                        <p class="text-sm font-medium text-slate-800 dark:text-slate-200">Post Anonymously</p>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Hide your real name</p>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="newPostAnonymous" class="sr-only peer" checked>
+                        <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-slate-600 peer-checked:bg-rose-500"></div>
+                    </label>
+                </div>
+                
+                <button onclick="submitPost()" class="w-full bg-rose-500 hover:bg-rose-600 text-white font-medium py-3 rounded-xl transition-colors">
+                    Post to Community
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Post Modal -->
+    <div id="viewPostModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4 opacity-0 transition-opacity duration-300">
+        <div class="bg-white dark:bg-slate-800 w-full max-w-md rounded-2xl shadow-xl overflow-hidden transform scale-95 transition-transform duration-300 flex flex-col h-[90vh]">
+            
+            <!-- Pinned Safety Notice -->
+            <div class="bg-amber-50 dark:bg-amber-900/30 border-b border-amber-200 dark:border-amber-800 p-3 text-xs text-amber-800 dark:text-amber-200 text-center flex-shrink-0">
+                <span class="font-semibold">📌 Safety Notice:</span> This is a safe, supportive space. Be kind. For medical concerns, please see a doctor.
+            </div>
+
+            <div class="p-4 border-b border-rose-100 dark:border-slate-700 flex justify-between items-center bg-white dark:bg-slate-800 flex-shrink-0">
+                <button onclick="closeViewPostModal()" class="text-slate-500 hover:text-rose-500 dark:text-slate-400 dark:hover:text-rose-400 font-medium transition-colors flex items-center gap-1 text-sm">
+                    &larr; Back
+                </button>
+            </div>
+            
+            <div class="p-5 overflow-y-auto flex-grow" id="viewPostContent">
+                <!-- Post content and replies injected here -->
+            </div>
+
+            <!-- Reply Input Area -->
+            <div class="p-4 border-t border-rose-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 flex-shrink-0">
+                <div class="flex gap-2">
+                    <input type="text" id="replyInput" placeholder="Write a supportive reply..." class="flex-grow p-3 rounded-xl border border-rose-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-rose-500">
+                    <button onclick="submitReply()" class="bg-rose-500 hover:bg-rose-600 text-white px-4 rounded-xl font-medium transition-colors">
+                        Reply
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Theme Management ---
+        function toggleTheme() {
+            if (document.documentElement.classList.contains('dark')) {
+                document.documentElement.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+            } else {
+                document.documentElement.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+
+        // --- Data Management ---
+        let posts = [];
+        let currentCategory = 'All';
+        let currentViewPostId = null;
+
+        const samplePosts = [
+            {
+                id: 'post_1',
+                username: 'FlowerBee92',
+                category: 'Cycle Questions',
+                title: 'Is it normal to have a 35-day cycle?',
+                body: 'My cycle has always been around 35 days, but I read that 28 is normal. Should I be worried? I track it every month and it is consistently 34-36 days.',
+                timestamp: new Date(Date.now() - 1000 * 60 * 30).toISOString(), // 30 mins ago
+                replies: [
+                    { id: 'reply_1_1', username: 'SunnyPetal14', body: 'Yes! Anything between 21 and 35 days is considered normal for adults. As long as it is consistent for YOU, that is what matters.', timestamp: new Date(Date.now() - 1000 * 60 * 15).toISOString() }
+                ]
+            },
+            {
+                id: 'post_2',
+                username: 'MoonlightWalker',
+                category: 'Symptoms',
+                title: 'Terrible lower back pain during period',
+                body: 'Does anyone else get really bad lower back pain on days 1 and 2? Heating pads help a little, but it is so distracting at work. Any tips?',
+                timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(), // 2 hours ago
+                replies: [
+                    { id: 'reply_2_1', username: 'WellnessWarrior', body: 'I get this too! Magnesium supplements a few days before my period starts have been a game changer for me.', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 1).toISOString() },
+                    { id: 'reply_2_2', username: 'CozyCat', body: 'Gentle yoga stretches specifically for the lower back help relieve the pressure for me.', timestamp: new Date(Date.now() - 1000 * 60 * 45).toISOString() }
+                ]
+            },
+            {
+                id: 'post_3',
+                username: 'HopefulHeart',
+                category: 'Pregnancy',
+                title: 'When did you get your first positive test?',
+                body: 'I am currently 10 DPO (days past ovulation) and got a negative test this morning. Is it too early? When did you all get your first faint line?',
+                timestamp: new Date(Date.now() - 1000 * 60 * 60 * 5).toISOString(), // 5 hours ago
+                replies: []
+            },
+            {
+                id: 'post_4',
+                username: 'GreenTeaLover',
+                category: 'Wellness Tips',
+                title: 'Seed cycling actually worked for me',
+                body: 'I started seed cycling (pumpkin/flax in follicular, sunflower/sesame in luteal) 3 months ago to help with breast tenderness, and I actually noticed a huge difference this cycle!',
+                timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(), // 1 day ago
+                replies: [
+                    { id: 'reply_4_1', username: 'CuriousMind', body: 'How do you incorporate them? Do you just eat them plain?', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 20).toISOString() },
+                    { id: 'reply_4_2', username: 'GreenTeaLover', body: 'I blend them into smoothies or sprinkle them on oatmeal and salads!', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 18).toISOString() }
+                ]
+            },
+            {
+                id: 'post_5',
+                username: 'OceanBreeze',
+                category: 'General',
+                title: 'Just started tracking my cycle!',
+                body: 'Hi everyone! I just downloaded this app and started tracking. I was on the pill for 5 years and just got off. Excited to learn more about my body.',
+                timestamp: new Date(Date.now() - 1000 * 60 * 60 * 48).toISOString(), // 2 days ago
+                replies: [
+                    { id: 'reply_5_1', username: 'FlowerBee92', body: 'Welcome! It takes a few months for your body to adjust after the pill, so be patient with yourself.', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 40).toISOString() }
+                ]
+            },
+            {
+                id: 'post_6',
+                username: 'StarryNight',
+                category: 'Cycle Questions',
+                title: 'Spotting during ovulation?',
+                body: 'I noticed a tiny bit of light pink spotting today, and according to my tracker I am ovulating. Is this normal?',
+                timestamp: new Date(Date.now() - 1000 * 60 * 60 * 72).toISOString(), // 3 days ago
+                replies: [
+                    { id: 'reply_6_1', username: 'NurseNora', body: 'Yes, ovulation spotting is completely normal for some women! It happens due to the sudden drop in estrogen right before ovulation.', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 70).toISOString() }
+                ]
+            },
+            {
+                id: 'post_7',
+                username: 'MorningDew',
+                category: 'Symptoms',
+                title: 'Extreme fatigue before period',
+                body: 'The week before my period, I am so exhausted I can barely keep my eyes open by 3 PM. Does anyone else experience this luteal phase fatigue?',
+                timestamp: new Date(Date.now() - 1000 * 60 * 60 * 96).toISOString(), // 4 days ago
+                replies: []
+            },
+            {
+                id: 'post_8',
+                username: 'AutumnLeaf',
+                category: 'Wellness Tips',
+                title: 'Favorite iron-rich meals?',
+                body: 'I tend to get slightly anemic during my period. What are your favorite iron-rich meals to make during that time?',
+                timestamp: new Date(Date.now() - 1000 * 60 * 60 * 120).toISOString(), // 5 days ago
+                replies: [
+                    { id: 'reply_8_1', username: 'ChefMama', body: 'Spinach and lentil soup! I also cook it in a cast iron skillet for extra iron.', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 115).toISOString() },
+                    { id: 'reply_8_2', username: 'SweetTooth', body: 'Dark chocolate! (Any excuse to eat chocolate, right?)', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 110).toISOString() }
+                ]
+            }
+        ];
+
+        function loadPosts() {
+            const stored = localStorage.getItem('communityPosts');
+            if (stored) {
+                posts = JSON.parse(stored);
+            } else {
+                posts = [...samplePosts];
+                savePosts();
+            }
+        }
+
+        function savePosts() {
+            localStorage.setItem('communityPosts', JSON.stringify(posts));
+        }
+
+        // --- UI Rendering ---
+
+        function formatTimeAgo(dateString) {
+            const date = new Date(dateString);
+            const now = new Date();
+            const diffMs = now - date;
+            const diffMins = Math.floor(diffMs / 60000);
+            const diffHours = Math.floor(diffMins / 60);
+            const diffDays = Math.floor(diffHours / 24);
+
+            if (diffMins < 1) return 'Just now';
+            if (diffMins < 60) return `${diffMins}m ago`;
+            if (diffHours < 24) return `${diffHours}h ago`;
+            if (diffDays === 1) return '1 day ago';
+            return `${diffDays} days ago`;
+        }
+
+        function getCategoryColor(category) {
+            const colors = {
+                'General': 'bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300',
+                'Cycle Questions': 'bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300',
+                'Pregnancy': 'bg-purple-100 text-purple-700 dark:bg-purple-900/50 dark:text-purple-300',
+                'Symptoms': 'bg-rose-100 text-rose-700 dark:bg-rose-900/50 dark:text-rose-300',
+                'Wellness Tips': 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300'
+            };
+            return colors[category] || colors['General'];
+        }
+
+        function renderFeed() {
+            const feed = document.getElementById('postFeed');
+            feed.innerHTML = '';
+
+            // Sort posts by newest first
+            const sortedPosts = [...posts].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+            const filteredPosts = currentCategory === 'All' 
+                ? sortedPosts 
+                : sortedPosts.filter(p => p.category === currentCategory);
+
+            if (filteredPosts.length === 0) {
+                feed.innerHTML = `
+                    <div class="text-center py-12 bg-white dark:bg-slate-800 rounded-2xl border border-rose-100 dark:border-slate-700">
+                        <div class="text-4xl mb-3">🌱</div>
+                        <h3 class="text-lg font-medium text-slate-800 dark:text-slate-200 mb-1">No posts yet</h3>
+                        <p class="text-slate-500 dark:text-slate-400 text-sm">Be the first to start a discussion in this category!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            filteredPosts.forEach(post => {
+                const replyCount = post.replies ? post.replies.length : 0;
+                const card = document.createElement('div');
+                card.className = 'bg-white dark:bg-slate-800 rounded-2xl p-5 shadow-sm border border-rose-100 dark:border-slate-700 cursor-pointer hover:shadow-md transition-shadow';
+                card.onclick = () => openViewPostModal(post.id);
+                
+                card.innerHTML = `
+                    <div class="flex justify-between items-start mb-3">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-full bg-rose-100 dark:bg-slate-700 flex items-center justify-center text-rose-500 dark:text-rose-400 font-bold text-sm">
+                                ${post.username.charAt(0)}
+                            </div>
+                            <div>
+                                <p class="text-sm font-semibold text-slate-800 dark:text-slate-200">${post.username}</p>
+                                <p class="text-xs text-slate-500 dark:text-slate-400">${formatTimeAgo(post.timestamp)}</p>
+                            </div>
+                        </div>
+                        <span class="text-[10px] uppercase tracking-wider font-bold px-2 py-1 rounded-md ${getCategoryColor(post.category)}">
+                            ${post.category}
+                        </span>
+                    </div>
+                    <h3 class="text-lg font-bold text-slate-800 dark:text-slate-100 mb-2 leading-tight">${post.title}</h3>
+                    <p class="text-slate-600 dark:text-slate-300 text-sm line-clamp-2 mb-4">${post.body}</p>
+                    <div class="flex items-center text-slate-500 dark:text-slate-400 text-sm font-medium gap-1">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
+                        ${replyCount} ${replyCount === 1 ? 'Reply' : 'Replies'}
+                    </div>
+                `;
+                feed.appendChild(card);
+            });
+        }
+
+        function filterPosts(category) {
+            currentCategory = category;
+            
+            // Update tab styling
+            document.querySelectorAll('.category-tab').forEach(tab => {
+                if (tab.dataset.category === category) {
+                    tab.className = 'category-tab active px-4 py-2 rounded-full text-sm font-medium bg-rose-500 text-white transition-colors';
+                } else {
+                    tab.className = 'category-tab px-4 py-2 rounded-full text-sm font-medium bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-rose-100 dark:border-slate-700 hover:bg-rose-50 dark:hover:bg-slate-700 transition-colors';
+                }
+            });
+
+            renderFeed();
+        }
+
+        // --- Modals & Interactions ---
+
+        function generateAnonymousUsername() {
+            const adjs = ['Happy', 'Sunny', 'Cozy', 'Brave', 'Gentle', 'Wild', 'Sweet', 'Calm'];
+            const nouns = ['Petal', 'Bee', 'Moon', 'Star', 'Wave', 'Bird', 'Leaf', 'Cloud'];
+            const num = Math.floor(Math.random() * 99) + 1;
+            const adj = adjs[Math.floor(Math.random() * adjs.length)];
+            const noun = nouns[Math.floor(Math.random() * nouns.length)];
+            return `${adj}${noun}${num}`;
+        }
+
+        function openCreatePostModal() {
+            const modal = document.getElementById('createPostModal');
+            modal.classList.remove('hidden');
+            // Small delay to allow display:block to apply before animating opacity
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                modal.querySelector('div').classList.remove('scale-95');
+            }, 10);
+            
+            // Reset form
+            document.getElementById('newPostTitle').value = '';
+            document.getElementById('newPostBody').value = '';
+            document.getElementById('newPostCategory').value = 'General';
+            document.getElementById('newPostAnonymous').checked = true;
+        }
+
+        function closeCreatePostModal() {
+            const modal = document.getElementById('createPostModal');
+            modal.classList.add('opacity-0');
+            modal.querySelector('div').classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
+
+        function submitPost() {
+            const title = document.getElementById('newPostTitle').value.trim();
+            const body = document.getElementById('newPostBody').value.trim();
+            const category = document.getElementById('newPostCategory').value;
+            const isAnonymous = document.getElementById('newPostAnonymous').checked;
+
+            if (!title || !body) {
+                alert('Please enter both a title and a message.');
+                return;
+            }
+
+            const newPost = {
+                id: 'post_' + Date.now(),
+                username: isAnonymous ? generateAnonymousUsername() : 'Me', // In a real app, 'Me' would be the user's profile name
+                category: category,
+                title: title,
+                body: body,
+                timestamp: new Date().toISOString(),
+                replies: []
+            };
+
+            posts.push(newPost);
+            savePosts();
+            
+            // If we are filtering, switch to 'All' or the new post's category so they see it
+            if (currentCategory !== 'All' && currentCategory !== category) {
+                filterPosts('All');
+            } else {
+                renderFeed();
+            }
+            
+            closeCreatePostModal();
+        }
+
+        function openViewPostModal(postId) {
+            currentViewPostId = postId;
+            const post = posts.find(p => p.id === postId);
+            if (!post) return;
+
+            const contentArea = document.getElementById('viewPostContent');
+            
+            let repliesHtml = '';
+            if (post.replies && post.replies.length > 0) {
+                repliesHtml = post.replies.map(reply => `
+                    <div class="mb-4 pb-4 border-b border-rose-50 dark:border-slate-700/50 last:border-0 last:mb-0 last:pb-0">
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="text-sm font-semibold text-slate-800 dark:text-slate-200">${reply.username}</span>
+                            <span class="text-xs text-slate-500 dark:text-slate-400">${formatTimeAgo(reply.timestamp)}</span>
+                        </div>
+                        <p class="text-slate-700 dark:text-slate-300 text-sm">${reply.body}</p>
+                    </div>
+                `).join('');
+            } else {
+                repliesHtml = `<p class="text-slate-500 dark:text-slate-400 text-sm italic text-center py-4">No replies yet. Be the first to reply!</p>`;
+            }
+
+            contentArea.innerHTML = `
+                <div class="mb-6">
+                    <div class="flex justify-between items-start mb-3">
+                        <div class="flex items-center gap-2">
+                            <div class="w-10 h-10 rounded-full bg-rose-100 dark:bg-slate-700 flex items-center justify-center text-rose-500 dark:text-rose-400 font-bold text-lg">
+                                ${post.username.charAt(0)}
+                            </div>
+                            <div>
+                                <p class="text-base font-semibold text-slate-800 dark:text-slate-200">${post.username}</p>
+                                <p class="text-xs text-slate-500 dark:text-slate-400">${formatTimeAgo(post.timestamp)}</p>
+                            </div>
+                        </div>
+                        <span class="text-[10px] uppercase tracking-wider font-bold px-2 py-1 rounded-md ${getCategoryColor(post.category)}">
+                            ${post.category}
+                        </span>
+                    </div>
+                    <h2 class="text-xl font-bold text-slate-800 dark:text-slate-100 mb-3">${post.title}</h2>
+                    <p class="text-slate-700 dark:text-slate-300 text-base leading-relaxed whitespace-pre-wrap">${post.body}</p>
+                </div>
+                
+                <div class="border-t border-rose-100 dark:border-slate-700 pt-4">
+                    <h3 class="text-sm font-bold text-slate-800 dark:text-slate-200 mb-4 uppercase tracking-wider">Replies (${post.replies ? post.replies.length : 0})</h3>
+                    <div class="flex flex-col">
+                        ${repliesHtml}
+                    </div>
+                </div>
+            `;
+
+            const modal = document.getElementById('viewPostModal');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                modal.querySelector('div').classList.remove('scale-95');
+            }, 10);
+            
+            document.getElementById('replyInput').value = '';
+        }
+
+        function closeViewPostModal() {
+            const modal = document.getElementById('viewPostModal');
+            modal.classList.add('opacity-0');
+            modal.querySelector('div').classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                currentViewPostId = null;
+            }, 300);
+        }
+
+        function submitReply() {
+            if (!currentViewPostId) return;
+            
+            const input = document.getElementById('replyInput');
+            const body = input.value.trim();
+            
+            if (!body) return;
+
+            const postIndex = posts.findIndex(p => p.id === currentViewPostId);
+            if (postIndex === -1) return;
+
+            if (!posts[postIndex].replies) {
+                posts[postIndex].replies = [];
+            }
+
+            const newReply = {
+                id: 'reply_' + Date.now(),
+                username: generateAnonymousUsername(), // Always anonymous for simplicity in this demo
+                body: body,
+                timestamp: new Date().toISOString()
+            };
+
+            posts[postIndex].replies.push(newReply);
+            savePosts();
+            
+            // Re-render the view modal to show the new reply
+            openViewPostModal(currentViewPostId);
+            
+            // Also re-render the feed in the background to update reply counts
+            renderFeed();
+        }
+
+        // Initialize
+        loadPosts();
+        renderFeed();
+
+    </script>
+</body>
+</html>

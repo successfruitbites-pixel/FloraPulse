@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Dashboard - FloraPulse</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+        }
+        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-rose-50 dark:bg-slate-900 min-h-screen flex flex-col items-center py-8 px-4 transition-colors duration-200">
+    <div class="w-full max-w-[480px] md:max-w-2xl mx-auto flex-grow flex flex-col">
+        <!-- Top Navigation -->
+        <div class="w-full flex justify-between items-center mb-8">
+            <a href="index.html" class="text-slate-500 hover:text-rose-500 dark:text-slate-400 dark:hover:text-rose-400 font-medium transition-colors flex items-center gap-1 text-sm">
+                &larr; Back to Home
+            </a>
+        </div>
+
+        <!-- Header -->
+        <header class="text-center mb-10">
+            <h1 class="text-3xl md:text-4xl font-bold text-rose-500 dark:text-rose-400 mb-2 tracking-tight">My Dashboard</h1>
+            <p class="text-slate-600 dark:text-slate-300 font-medium" id="cycleDayDisplay">Loading your cycle data...</p>
+            <div id="phaseDisplay" class="mt-3 inline-block px-4 py-2 rounded-full text-sm font-semibold bg-white dark:bg-slate-800 shadow-sm border border-slate-100 dark:border-slate-700">
+                <!-- Phase label will be injected here -->
+            </div>
+        </header>
+
+        <!-- Snapshot Cards (2x2 Grid) -->
+        <div class="grid grid-cols-2 gap-4 mb-10">
+            <!-- Card 1: Next Period -->
+            <div class="bg-rose-100/50 dark:bg-rose-900/20 rounded-2xl p-5 flex flex-col border border-rose-200 dark:border-rose-800/30">
+                <div class="text-2xl mb-2">📅</div>
+                <h3 class="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">Next Period</h3>
+                <p class="text-lg font-bold text-rose-600 dark:text-rose-400" id="nextPeriodDisplay">--</p>
+            </div>
+
+            <!-- Card 2: Ovulation Window -->
+            <div class="bg-amber-100/50 dark:bg-amber-900/20 rounded-2xl p-5 flex flex-col border border-amber-200 dark:border-amber-800/30">
+                <div class="text-2xl mb-2">🌸</div>
+                <h3 class="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">Ovulation</h3>
+                <p class="text-lg font-bold text-amber-600 dark:text-amber-400" id="ovulationDisplay">--</p>
+            </div>
+
+            <!-- Card 3: Last Logged Symptom -->
+            <div class="bg-blue-100/50 dark:bg-blue-900/20 rounded-2xl p-5 flex flex-col border border-blue-200 dark:border-blue-800/30">
+                <div class="text-2xl mb-2">💧</div>
+                <h3 class="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">Last Symptom</h3>
+                <p class="text-base font-medium text-blue-600 dark:text-blue-400" id="lastSymptomDisplay">Nothing logged yet</p>
+            </div>
+
+            <!-- Card 4: Last Logged Mood -->
+            <div class="bg-emerald-100/50 dark:bg-emerald-900/20 rounded-2xl p-5 flex flex-col border border-emerald-200 dark:border-emerald-800/30">
+                <div class="text-2xl mb-2">😊</div>
+                <h3 class="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">Last Mood</h3>
+                <p class="text-base font-medium text-emerald-600 dark:text-emerald-400" id="lastMoodDisplay">Nothing logged yet</p>
+            </div>
+        </div>
+
+        <!-- Personalized Insights -->
+        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm p-6 border border-slate-100 dark:border-slate-700 mb-8">
+            <h2 class="text-xl font-bold text-slate-800 dark:text-slate-100 mb-4 flex items-center gap-2">
+                <span>✨</span> Daily Insights
+            </h2>
+            <ul id="insightsList" class="space-y-3 text-slate-600 dark:text-slate-300">
+                <!-- Insights will be injected here -->
+            </ul>
+        </div>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            loadDashboardData();
+        });
+
+        function loadDashboardData() {
+            const lpdVal = localStorage.getItem('lastPeriodDate');
+            const cycleVal = localStorage.getItem('cycleLength');
+            
+            const dayDisplay = document.getElementById('cycleDayDisplay');
+            const phaseDisplay = document.getElementById('phaseDisplay');
+            const nextPeriodDisplay = document.getElementById('nextPeriodDisplay');
+            const ovulationDisplay = document.getElementById('ovulationDisplay');
+            const insightsList = document.getElementById('insightsList');
+
+            if (!lpdVal || !cycleVal) {
+                dayDisplay.textContent = "No cycle data found.";
+                phaseDisplay.textContent = "Please set up your tracker first.";
+                phaseDisplay.className = "mt-3 inline-block px-4 py-2 rounded-full text-sm font-semibold bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 shadow-sm border border-slate-200 dark:border-slate-700";
+                nextPeriodDisplay.textContent = "Setup needed";
+                ovulationDisplay.textContent = "Setup needed";
+                insightsList.innerHTML = `<li><a href="ovulation.html" class="text-rose-500 hover:underline">Go to Ovulation Tracker to get started.</a></li>`;
+                loadTrackerData();
+                return;
+            }
+
+            const cycleLength = parseInt(cycleVal, 10);
+            const [year, month, day] = lpdVal.split('-').map(Number);
+            let lpd = new Date(year, month - 1, day);
+            
+            const today = new Date();
+            today.setHours(0,0,0,0);
+
+            // Fast forward to current cycle if LPD is too old
+            let nextPeriod = new Date(lpd);
+            nextPeriod.setDate(nextPeriod.getDate() + cycleLength);
+            
+            while (nextPeriod <= today) {
+                lpd = new Date(nextPeriod);
+                nextPeriod.setDate(nextPeriod.getDate() + cycleLength);
+            }
+
+            // Calculate current cycle day (1-indexed)
+            const diffTime = Math.abs(today - lpd);
+            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+            const currentDay = diffDays + 1;
+
+            dayDisplay.textContent = `Day ${currentDay} of your cycle`;
+
+            // Determine Phase dynamically based on cycle length
+            const ovulationDayNum = cycleLength - 14;
+            const ovWindowStartNum = ovulationDayNum - 2;
+            const ovWindowEndNum = ovulationDayNum + 2;
+
+            let phaseText = "";
+            let phaseClass = "";
+            let insights = [];
+
+            if (currentDay >= 1 && currentDay <= 5) {
+                phaseText = "🔴 Menstrual Phase — Your period is here";
+                phaseClass = "text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/30 border-red-200 dark:border-red-800/50";
+                insights = [
+                    "Rest more, iron-rich foods help today.",
+                    "Keep hydrated and try gentle stretching if you have cramps.",
+                    "It's okay to take it easy and prioritize self-care."
+                ];
+            } else if (currentDay >= 6 && currentDay < ovWindowStartNum) {
+                phaseText = "🌱 Follicular Phase — Energy is rising";
+                phaseClass = "text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/30 border-green-200 dark:border-green-800/50";
+                insights = [
+                    "Great time to start new projects.",
+                    "Your energy levels are increasing, good for active workouts.",
+                    "Brain fog is lifting, making it easier to focus."
+                ];
+            } else if (currentDay >= ovWindowStartNum && currentDay <= ovWindowEndNum) {
+                phaseText = "🌸 Ovulation Phase — Peak fertility";
+                // High risk (orange) is start of window through ovulation day
+                if (currentDay <= ovulationDayNum) {
+                    phaseClass = "text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-900/30 border-orange-200 dark:border-orange-800/50";
+                } else {
+                    // Rest of window is yellow
+                    phaseClass = "text-yellow-600 dark:text-yellow-400 bg-yellow-50 dark:bg-yellow-900/30 border-yellow-200 dark:border-yellow-800/50";
+                }
+                insights = [
+                    "Your most fertile days — plan accordingly.",
+                    "You might feel more social and communicative.",
+                    "Energy is at its peak!"
+                ];
+            } else {
+                phaseText = "🍂 Luteal Phase — Wind-down phase";
+                phaseClass = "text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-slate-900/30 border-slate-200 dark:border-slate-800/50";
+                insights = [
+                    "Cravings are normal. Be kind to yourself.",
+                    "Energy might start to dip, focus on lighter exercises.",
+                    "Good time for organizing and completing tasks."
+                ];
+            }
+
+            phaseDisplay.textContent = phaseText;
+            phaseDisplay.className = `mt-3 inline-block px-4 py-2 rounded-full text-sm font-semibold shadow-sm border ${phaseClass}`;
+
+            // Render Insights
+            insightsList.innerHTML = insights.map(tip => `<li class="flex items-start gap-2"><span class="text-rose-400 mt-0.5">•</span> <span>${tip}</span></li>`).join('');
+
+            // Calculate days away
+            const daysToNextPeriod = Math.ceil((nextPeriod - today) / (1000 * 60 * 60 * 24));
+            nextPeriodDisplay.textContent = daysToNextPeriod === 0 ? "Today" : (daysToNextPeriod === 1 ? "Tomorrow" : `In ${daysToNextPeriod} days`);
+
+            let ovulationDay = new Date(lpd);
+            ovulationDay.setDate(ovulationDay.getDate() + (cycleLength - 14));
+            
+            if (ovulationDay < today) {
+                // Next ovulation
+                ovulationDay = new Date(nextPeriod);
+                ovulationDay.setDate(ovulationDay.getDate() + (cycleLength - 14));
+            }
+            
+            const daysToOvulation = Math.ceil((ovulationDay - today) / (1000 * 60 * 60 * 24));
+            
+            // If we are IN the ovulation window (ovulationDay - 2 to ovulationDay + 2)
+            const ovWindowStart = new Date(ovulationDay);
+            ovWindowStart.setDate(ovWindowStart.getDate() - 2);
+            const ovWindowEnd = new Date(ovulationDay);
+            ovWindowEnd.setDate(ovWindowEnd.getDate() + 2);
+
+            if (today >= ovWindowStart && today <= ovWindowEnd) {
+                ovulationDisplay.textContent = "Happening now";
+            } else {
+                ovulationDisplay.textContent = daysToOvulation === 0 ? "Today" : (daysToOvulation === 1 ? "Tomorrow" : `In ${daysToOvulation} days`);
+            }
+
+            loadTrackerData();
+        }
+
+        function loadTrackerData() {
+            const symptomLogs = JSON.parse(localStorage.getItem('symptomLogs') || '[]');
+            const moodLogs = JSON.parse(localStorage.getItem('moodLogs') || '[]');
+
+            const lastSymptomDisplay = document.getElementById('lastSymptomDisplay');
+            const lastMoodDisplay = document.getElementById('lastMoodDisplay');
+
+            if (symptomLogs.length > 0) {
+                // Assuming logs are sorted or we just take the last one
+                const lastSymptom = symptomLogs[symptomLogs.length - 1];
+                lastSymptomDisplay.textContent = lastSymptom.symptom || lastSymptom; // Handle string or object
+            }
+
+            if (moodLogs.length > 0) {
+                const lastMood = moodLogs[moodLogs.length - 1];
+                lastMoodDisplay.textContent = lastMood.mood || lastMood;
+            }
+        }
+    </script>
+</body>
+</html>

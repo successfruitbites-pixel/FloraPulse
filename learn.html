@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learn - FloraPulse</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = { darkMode: 'class' }
+        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .line-clamp-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;  
+            overflow: hidden;
+        }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-rose-50 dark:bg-slate-900 min-h-screen flex flex-col items-center py-8 px-4 transition-colors duration-200">
+    <div class="w-full max-w-[480px] md:max-w-2xl mx-auto flex-grow flex flex-col relative">
+        <div class="w-full flex justify-between items-center mb-8">
+            <a href="index.html" class="text-slate-500 hover:text-rose-500 dark:text-slate-400 dark:hover:text-rose-400 font-medium transition-colors flex items-center gap-1 text-sm">
+                &larr; Back to Home
+            </a>
+        </div>
+
+        <header class="text-center mb-8">
+            <h1 class="text-3xl md:text-4xl font-bold text-rose-500 dark:text-rose-400 mb-2 tracking-tight">Learn</h1>
+            <p class="text-slate-600 dark:text-slate-300 font-medium">Articles on cycle & reproductive health</p>
+        </header>
+
+        <div class="relative mb-6">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <span class="text-slate-400">🔍</span>
+            </div>
+            <input type="text" id="searchInput" placeholder="Search articles..." class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-rose-500 dark:focus:ring-rose-400 transition-shadow shadow-sm">
+        </div>
+
+        <div class="flex overflow-x-auto no-scrollbar gap-2 mb-8 pb-2" id="categoryTabs"></div>
+
+        <div id="articlesGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8"></div>
+
+        <div id="noResults" class="hidden text-center py-12">
+            <div class="text-4xl mb-4">🤷‍♀️</div>
+            <h3 class="text-lg font-semibold text-slate-800 dark:text-slate-100 mb-1">No articles found</h3>
+            <p class="text-slate-600 dark:text-slate-400">Try adjusting your search or category filter.</p>
+        </div>
+    </div>
+
+    <div id="articleModal" class="fixed inset-0 z-50 flex flex-col bg-white dark:bg-slate-900 hidden opacity-0 transition-opacity duration-300 overflow-y-auto">
+        <div class="w-full max-w-[480px] md:max-w-2xl mx-auto flex-grow flex flex-col p-6">
+            <button id="closeModalBtn" class="self-start text-slate-500 hover:text-rose-500 dark:text-slate-400 dark:hover:text-rose-400 font-medium transition-colors flex items-center gap-1 text-sm mb-6">
+                &larr; Back to Articles
+            </button>
+            <div id="modalContent" class="pb-12"></div>
+        </div>
+    </div>
+
+    <script>
+        const articles = [
+            {
+                id: 1, title: "Understanding Your Menstrual Cycle", category: "Cycle Basics", emoji: "🌸", readTime: "5 min read",
+                description: "Your cycle is so much more than just your period. Learn what is really happening in your body each month.",
+                content: "<p class='mb-4 text-slate-700 dark:text-slate-300'>Your menstrual cycle is one of the most powerful and fascinating things your body does — and yet most of us were never properly taught how it actually works. It is so much more than just your period. Your cycle is a monthly hormonal journey that affects your energy, mood, skin, appetite, sleep, and even how confident you feel. Understanding it is one of the best things you can do for your health.</p><p class='mb-4 text-slate-700 dark:text-slate-300'>A typical cycle lasts between 21 and 35 days, with 28 days being the average — though there is no single normal. Your cycle begins on the first day of your period (Day 1) and ends the day before your next period starts. It is divided into four distinct phases: the Menstrual Phase, the Follicular Phase, the Ovulation Phase, and the Luteal Phase. Each phase has its own hormonal signature and feels completely different in your body.</p><p class='mb-4 text-slate-700 dark:text-slate-300'>During the Menstrual Phase (Days 1–5), your uterus sheds its lining because no pregnancy occurred. Estrogen and progesterone are at their lowest, which is why you may feel tired, introspective, or low-energy. This is your body asking for rest — and it deserves it. The Follicular Phase (Days 6–13) follows, and this is where things start to pick up. Estrogen begins rising, your energy returns, your skin often clears up, and you may feel more sociable and motivated. This is a great time to start new projects or tackle big tasks.</p><p class='mb-4 text-slate-700 dark:text-slate-300'>The Ovulation Phase (Days 14–16 in a 28-day cycle) is the peak of your cycle. Your body releases an egg, estrogen surges, and many women feel their most confident, communicative, and attractive during this window. Finally, the Luteal Phase (Days 17–28) is the wind-down. Progesterone rises to prepare the uterus for a possible pregnancy. If no pregnancy occurs, both hormones drop and your period begins again. This phase is when PMS symptoms like bloating, mood swings, and cravings tend to show up.</p><p class='text-slate-700 dark:text-slate-300'>Tracking your cycle is not just about predicting your period — it is about understanding your personal rhythm. When you know where you are in your cycle, you can plan your social life, workouts, meals, and even important conversations around your natural energy patterns. Knowledge is power, and your cycle is giving you information every single day. Start listening to it.</p>"
+            },
+            {
+                id: 2, title: "What is Ovulation and Why Does It Matter?", category: "Fertility", emoji: "🌺", readTime: "5 min read",
+                description: "Ovulation is the main event of your entire cycle. Here is everything you need to know about it.",
+                content: "<p class='mb-4 text-slate-700 dark:text-slate-300'>Ovulation is the main event of your entire menstrual cycle — everything else builds up to it or winds down from it. Simply put, ovulation is the moment your ovary releases a mature egg into the fallopian tube, where it waits to be fertilized. This egg only survives for 12 to 24 hours, which makes ovulation a very specific and time-sensitive event. Whether you are trying to get pregnant or trying to avoid it, knowing when you ovulate is absolutely essential.</p><p class='mb-4 text-slate-700 dark:text-slate-300'>Ovulation typically happens around the middle of your cycle — Day 14 in a textbook 28-day cycle — but this varies from woman to woman and even cycle to cycle. A more reliable way to estimate your ovulation day is to count 14 days back from when your next period is expected. For example, if you have a 30-day cycle, ovulation likely occurs around Day 16. FloraPulse calculates this for you automatically, taking the guesswork out of it.</p><p class='mb-4 text-slate-700 dark:text-slate-300'>The days surrounding ovulation are called your fertile window — the time when pregnancy is possible. This window spans about 5 to 6 days: the 5 days before ovulation (because sperm can survive inside the body for up to 5 days), the day of ovulation itself, and the day after. Having unprotected sex during this window significantly increases the chance of pregnancy. Outside this window, the chances drop dramatically — though they are never zero.</p><p class='mb-4 text-slate-700 dark:text-slate-300'>Ovulation is also a sign that your reproductive system is healthy. Regular ovulation means your hormones are balanced and your cycle is functioning well. Irregular or absent ovulation can be a signal that something needs attention — like high stress levels, significant weight changes, thyroid issues, or a condition like Polycystic Ovary Syndrome (PCOS). If your cycles are very irregular, tracking your cycle carefully and speaking with a healthcare provider is a smart move.</p><p class='text-slate-700 dark:text-slate-300'>Beyond pregnancy planning, ovulation affects how you feel day to day. The estrogen surge around ovulation is linked to higher energy, better mood, clearer skin, and even a naturally higher pain tolerance. Many women report feeling their absolute best in the days around ovulation. Now that you know why, you can start making the most of this natural energy peak every month.</p>"
+            },
+            {
+                id: 3, title: "Safe Sex Days — Fact vs Myth", category: "Cycle Basics", emoji: "💡", readTime: "6 min read",
+                description: "The truth about safe days, the calendar method, and what actually keeps you protected.",
+                content: "<p class='mb-4 text-slate-700 dark:text-slate-300'>The idea of safe days — days in your cycle when pregnancy is supposedly impossible — is one of the most misunderstood concepts in women's reproductive health. Many women rely on the calendar method as their sole form of contraception, and many end up with unintended pregnancies as a result. Let us break down what is fact, what is myth, and what you actually need to know to make informed decisions.</p><h3 class='text-xl font-semibold text-slate-800 dark:text-slate-100 mt-6 mb-3'>MYTH: You cannot get pregnant right after your period.</h3><p class='mb-4 text-slate-700 dark:text-slate-300'><strong>FACT:</strong> This is one of the most common and dangerous myths. If you have a short cycle (21–24 days), ovulation can occur as early as Day 7 or 8. Since sperm can survive in the body for up to 5 days, having unprotected sex at the end of your period could absolutely lead to pregnancy. There is no universally safe time that applies to every woman.</p><h3 class='text-xl font-semibold text-slate-800 dark:text-slate-100 mt-6 mb-3'>MYTH: The calendar method is reliable contraception.</h3><p class='mb-4 text-slate-700 dark:text-slate-300'><strong>FACT:</strong> The fertility awareness method, which includes calendar tracking, has a typical-use failure rate of around 24% — meaning roughly 1 in 4 women using it as their only method will get pregnant within a year. It works best when combined with other indicators like basal body temperature tracking and cervical mucus observation, and when cycles are very regular. For women with irregular cycles, it is particularly unreliable.</p><h3 class='text-xl font-semibold text-slate-800 dark:text-slate-100 mt-6 mb-3'>MYTH: You can only get pregnant during ovulation.</h3><p class='mb-4 text-slate-700 dark:text-slate-300'><strong>FACT:</strong> While the egg itself only survives 12–24 hours, sperm can live inside the female reproductive tract for up to 5 days. This means that sex up to 5 days before ovulation can still result in pregnancy. Your fertile window is wider than most people realize — approximately 6 days total.</p><h3 class='text-xl font-semibold text-slate-800 dark:text-slate-100 mt-6 mb-3'>MYTH: Apps can tell me exactly when I am safe.</h3><p class='mb-4 text-slate-700 dark:text-slate-300'><strong>FACT:</strong> Apps like FloraPulse are tools for awareness and education, not medical contraception. Cycle length can vary due to stress, illness, travel, and diet changes. If preventing pregnancy is your primary goal, please use a reliable form of contraception alongside cycle tracking — not instead of it. Condoms, the pill, and IUDs are all effective options worth discussing with your doctor.</p><p class='text-slate-700 dark:text-slate-300'>The most empowered approach is combining cycle awareness with barrier or hormonal contraception. Use FloraPulse to understand your body deeply, identify your fertile window, and plan accordingly — but always protect yourself. Knowledge and protection together are your strongest tools.</p>"
+            },
+            {
+                id: 4, title: "Signs of Ovulation to Watch For", category: "Fertility", emoji: "👁️", readTime: "5 min read",
+                description: "Your body sends clear signals when ovulation is near. Here is how to read them like a pro.",
+                content: "<p class='mb-4 text-slate-700 dark:text-slate-300'>Your body gives you clear signals when ovulation is approaching and happening — most women just were never taught to notice them. Once you start paying attention, these signs become surprisingly easy to spot. Whether you are trying to conceive or simply want to understand your body better, learning to read these signals is a genuine superpower.</p><p class='mb-4 text-slate-700 dark:text-slate-300'>The most reliable physical sign is a change in cervical mucus. Throughout your cycle, vaginal discharge changes in texture and appearance. In the days leading up to ovulation, it becomes clear, slippery, and stretchy — very similar to raw egg whites. This consistency is designed to help sperm travel easily toward the egg. If you notice this type of discharge, ovulation is likely within the next 1–3 days. After ovulation, discharge typically becomes thicker, cloudier, or disappears almost entirely.</p><p class='mb-4 text-slate-700 dark:text-slate-300'>A rise in basal body temperature (BBT) is another strong indicator. Your resting temperature rises slightly — by about 0.2 to 0.5 degrees Celsius — immediately after ovulation due to the hormone progesterone. To track this effectively, measure your temperature first thing every morning before getting out of bed, using a sensitive basal thermometer. A sustained rise over 3 or more days confirms that ovulation has occurred. Over time, charting your BBT reveals a clear pattern of your cycle.</p><p class='mb-4 text-slate-700 dark:text-slate-300'>Many women experience mittelschmerz — a German word meaning middle pain — which is a mild, one-sided cramping or twinge in the lower abdomen during ovulation. It typically lasts from a few minutes to a few hours and occurs on the side where the egg is being released. If you feel a brief, unexplained ache in your lower abdomen mid-cycle, that could be your body announcing ovulation.</p><p class='text-slate-700 dark:text-slate-300'>Other signs include increased libido, heightened senses like sharper smell or taste, slight breast tenderness, and feeling more energetic and social than usual. Some women also notice a slight increase in vaginal lubrication. None of these signs alone confirm ovulation — but when you combine multiple signs together, the picture becomes very clear. Track consistently and your body will become your most reliable guide.</p>"
+            },
+            {
+                id: 5, title: "Early Signs of Pregnancy", category: "Pregnancy", emoji: "👶", readTime: "6 min read",
+                description: "Know the signs before the test even confirms it. What your body may be telling you in early pregnancy.",
+                content: "<p class='mb-4 text-slate-700 dark:text-slate-300'>Whether you have been trying to conceive or the possibility of pregnancy is unexpected, knowing the early signs can help you understand what your body is telling you — often before a missed period. Every woman's experience is different, and some feel symptoms as early as one week after conception, while others feel nothing at all in the early weeks. Here is what to watch for.</p><p class='mb-4 text-slate-700 dark:text-slate-300'>The most well-known sign is a missed period. If your cycle is regular and your period is late by even a few days, it is worth taking a pregnancy test. Pregnancy tests detect a hormone called hCG (human chorionic gonadotropin), which the body starts producing shortly after a fertilized egg implants in the uterus. For the most accurate result, test with your first morning urine, when hCG concentration is highest. A faint line is still a positive — any line counts.</p><p class='mb-4 text-slate-700 dark:text-slate-300'>Breast changes are often one of the very first signs, sometimes appearing even before a missed period. You may notice your breasts feeling heavier, more tender, or unusually sore — similar to how they feel before a period but often more intense. The nipples may darken slightly and the veins on your chest may become more visible as blood flow increases to the area.</p><p class='mb-4 text-slate-700 dark:text-slate-300'>Fatigue is another extremely common early sign. In early pregnancy, the hormone progesterone surges dramatically, which can make you feel overwhelmingly tired — the kind of exhaustion that sleep does not seem to fix. Your body is working incredibly hard to build a new life. Nausea, often called morning sickness though it can occur any time of day, typically begins around 4 to 6 weeks and is triggered by rising hCG levels.</p><p class='text-slate-700 dark:text-slate-300'>Other early signs include light spotting called implantation bleeding which occurs about 10–14 days after conception and is often mistaken for a very light period, frequent urination, heightened sense of smell, food aversions or sudden cravings, mild cramping, bloating, mood swings, and a metallic taste in the mouth. If you suspect you may be pregnant, take a test and contact a healthcare provider as soon as possible. Early prenatal care makes a significant difference in both maternal and baby health. FloraPulse's pregnancy calculator can help you estimate your due date and track your trimester milestones while you await your first appointment.</p>"
+            },
+            {
+                id: 6, title: "What is the Luteal Phase?", category: "Cycle Basics", emoji: "🍂", readTime: "5 min read",
+                description: "The most misunderstood phase of your cycle — and why it holds the key to understanding PMS.",
+                content: "<p class='mb-4 text-slate-700 dark:text-slate-300'>The luteal phase is the second half of your menstrual cycle — the roughly two-week stretch between ovulation and the start of your next period. It is arguably the most misunderstood phase of the cycle, often written off as just PMS, when in reality it is a hormonally rich and important time your body goes through every single month. Understanding it can transform how you relate to yourself during this time.</p><p class='mb-4 text-slate-700 dark:text-slate-300'>After ovulation, the follicle that released the egg transforms into something called the corpus luteum — a temporary structure in the ovary that produces progesterone. Progesterone is the dominant hormone of the luteal phase, and its job is to prepare the uterine lining for a possible fertilized egg. Progesterone has a warming, calming effect on the body — it raises your basal body temperature slightly, slows digestion (hello, bloating), and can affect your mood and sleep quality.</p><p class='mb-4 text-slate-700 dark:text-slate-300'>If no fertilized egg implants, the corpus luteum breaks down after about 12–14 days. Progesterone and estrogen levels both drop sharply, which triggers the uterine lining to shed — and your period begins. This hormonal drop is what drives premenstrual symptoms: mood swings, irritability, tearfulness, anxiety, food cravings, fatigue, and physical discomfort like bloating and breast tenderness.</p><p class='mb-4 text-slate-700 dark:text-slate-300'>The luteal phase is also when many women feel a natural pull toward quieter, more introspective activities. Energy is lower than during the follicular or ovulation phases, and social settings can feel more overwhelming. This is not weakness — it is your body's biology. Many women find the luteal phase easier to navigate when they reduce intense social commitments, prioritize sleep, eat warm nourishing foods, and allow themselves more rest than usual.</p><p class='text-slate-700 dark:text-slate-300'>Luteal Phase Defect is a condition where the luteal phase is shorter than normal (less than 10 days) or progesterone levels are insufficient. This can make it harder to conceive or maintain a pregnancy, and it can also cause very short cycles or spotting before your period. If you consistently notice your luteal phase lasting less than 10 days, or if you experience spotting between ovulation and your period, it is worth mentioning to a doctor. For most women, though, the luteal phase is simply a time to be gentler with yourself — and now you know why.</p>"
+            },
+            {
+                id: 7, title: "Managing Period Pain Naturally", category: "Symptoms", emoji: "🌿", readTime: "6 min read",
+                description: "From heat therapy to nutrition — natural, evidence-backed ways to reduce period pain.",
+                content: "<p class='mb-4 text-slate-700 dark:text-slate-300'>Period pain — medically called dysmenorrhea — affects up to 80% of women at some point in their lives. For many, it is more than a minor inconvenience. Cramping, back pain, nausea, headaches, and fatigue can make the first few days of a period genuinely difficult to get through. The good news is that there are several natural, evidence-backed approaches that can make a real difference — without always reaching for painkillers.</p><p class='mb-4 text-slate-700 dark:text-slate-300'>Heat therapy is one of the most effective and immediate remedies for period cramps. Applying a heating pad, hot water bottle, or warm towel to your lower abdomen helps relax the uterine muscles that are contracting during your period. Research has shown that heat can be as effective as ibuprofen for mild to moderate cramps. A warm bath works similarly and has the added benefit of relaxing your whole body, easing back pain and tension at the same time.</p><p class='mb-4 text-slate-700 dark:text-slate-300'>Gentle movement, while it may be the last thing you want to do, can significantly reduce cramping. Light exercise like walking, gentle yoga, or stretching increases blood flow to the pelvic area and releases endorphins — your body's natural painkillers. Specific yoga poses like child's pose, cat-cow, supine twist, and legs-up-the-wall are particularly effective for relieving menstrual cramps. Even a 15-minute walk can shift how you feel.</p><p class='mb-4 text-slate-700 dark:text-slate-300'>Diet plays a surprisingly powerful role in period pain. Foods high in omega-3 fatty acids like salmon, walnuts, chia seeds, and flaxseed have anti-inflammatory properties that can reduce the intensity of cramps. Magnesium-rich foods like dark chocolate, bananas, spinach, and almonds help relax muscles and reduce cramping. On the flip side, caffeine, alcohol, salty foods, and sugar can worsen bloating and cramps — so reducing these in the days before and during your period can help noticeably.</p><p class='text-slate-700 dark:text-slate-300'>Herbal remedies have been used for menstrual pain for centuries. Ginger tea has been shown in studies to reduce period pain comparably to ibuprofen. Chamomile tea has muscle-relaxing and anti-inflammatory properties. Cinnamon supplements have been found to reduce cramping, nausea, and heavy flow. If your period pain is severe enough to interfere with your daily life — meaning you cannot work, study, or function normally — please speak with a healthcare provider. Severe pain can be a sign of conditions like endometriosis or fibroids, which are very treatable but require a proper diagnosis. You deserve to not suffer every month.</p>"
+            },
+            {
+                id: 8, title: "How Stress Affects Your Cycle", category: "Wellness", emoji: "🧘", readTime: "5 min read",
+                description: "Why your period goes missing when life gets hard — and what you can actually do about it.",
+                content: "<p class='mb-4 text-slate-700 dark:text-slate-300'>If you have ever noticed your period arriving late after a particularly stressful month, or experienced a heavier-than-usual flow during a difficult period of your life, you have felt firsthand just how powerfully stress affects your menstrual cycle. This connection is not in your head — it is deeply rooted in your body's hormonal and nervous system responses.</p><p class='mb-4 text-slate-700 dark:text-slate-300'>When you experience stress, your body releases a hormone called cortisol — your primary stress hormone. Cortisol is incredibly useful in short bursts, but when it stays elevated for weeks or months, it begins to interfere with the hormones that regulate your cycle. Specifically, high cortisol levels can suppress the release of GnRH (gonadotropin-releasing hormone), which is the hormone that kicks off the entire ovulation process. Less GnRH means delayed or absent ovulation — which means a late or missed period.</p><p class='mb-4 text-slate-700 dark:text-slate-300'>Chronic stress can cause a range of cycle disruptions: late periods, skipped periods entirely, shorter or longer cycles than usual, changes in flow (heavier or lighter than normal), worse PMS symptoms, and more intense cramping. Women going through major life stressors — exam periods, relationship breakdowns, job loss, grief, or chronic illness — often notice their cycles becoming unpredictable during these times.</p><p class='mb-4 text-slate-700 dark:text-slate-300'>The relationship between stress and your cycle also runs in the other direction: the hormonal fluctuations of your cycle affect how you experience and respond to stress. During the luteal phase, when progesterone is high and then drops sharply, many women find they feel more anxious, overwhelmed, or emotionally reactive than usual. This can create a feedback loop — your cycle makes you more sensitive to stress, and stress disrupts your cycle further.</p><p class='text-slate-700 dark:text-slate-300'>The most powerful things you can do are the basics: prioritize sleep (aim for 7–9 hours), move your body gently and regularly, eat nourishing whole foods, and actively build stress management practices into your routine — whether that is journaling, meditation, deep breathing, time in nature, creative outlets, or therapy. Tracking your cycle alongside your stress levels in FloraPulse's Daily Tracker can help you spot patterns and understand exactly how your mental state is affecting your body. That awareness alone is genuinely healing.</p>"
+            },
+            {
+                id: 9, title: "Nutrition Tips for Each Cycle Phase", category: "Wellness", emoji: "🥗", readTime: "6 min read",
+                description: "Eat in sync with your hormones. What to eat during each phase of your cycle to feel your best.",
+                content: "<p class='mb-4 text-slate-700 dark:text-slate-300'>Your nutritional needs change throughout your cycle — and eating in sync with your hormones is one of the most underrated ways to boost your energy, stabilize your mood, reduce PMS, and support your overall health. This is not about dieting or restriction. It is about giving your body what it specifically needs at each stage of its monthly journey. Think of it as eating with your biology, not against it.</p><h3 class='text-xl font-semibold text-slate-800 dark:text-slate-100 mt-6 mb-3'>MENSTRUAL PHASE (Days 1–5): Replenish and Restore.</h3><p class='mb-4 text-slate-700 dark:text-slate-300'>During your period, your body loses blood and with it, iron and zinc. Focus on iron-rich foods like red meat, lentils, spinach, beans, and fortified cereals. Pair iron sources with vitamin C like oranges or bell peppers to boost absorption. Warm, easily digestible foods like soups, stews, and herbal teas support your body during this lower-energy phase. Stay well hydrated and avoid excess salt, sugar, and caffeine, which can worsen bloating and cramps.</p><h3 class='text-xl font-semibold text-slate-800 dark:text-slate-100 mt-6 mb-3'>FOLLICULAR PHASE (Days 6–13): Energize and Build.</h3><p class='mb-4 text-slate-700 dark:text-slate-300'>Estrogen is rising and so is your energy. Focus on cruciferous vegetables like broccoli, cauliflower, and Brussels sprouts, which help the liver process estrogen efficiently. Fermented foods like yogurt, kefir, kimchi, and sauerkraut support gut health, which plays a key role in hormone balance. This phase suits higher-intensity workouts, so increase your protein intake — lean meats, eggs, legumes, and quinoa are excellent choices.</p><h3 class='text-xl font-semibold text-slate-800 dark:text-slate-100 mt-6 mb-3'>OVULATION PHASE (Days 14–16): Support and Sustain.</h3><p class='mb-4 text-slate-700 dark:text-slate-300'>Focus on anti-inflammatory foods that support egg quality: berries, dark leafy greens, nuts, seeds, and colourful vegetables. Zinc found in pumpkin seeds, chickpeas, and cashews supports ovarian function. This is also a good time to reduce alcohol, which can disrupt hormonal balance. Light, balanced meals work well during this high-energy phase.</p><h3 class='text-xl font-semibold text-slate-800 dark:text-slate-100 mt-6 mb-3'>LUTEAL PHASE (Days 17–28): Calm and Nourish.</h3><p class='text-slate-700 dark:text-slate-300'>Your metabolism slightly increases in the luteal phase, meaning you genuinely need slightly more calories. Honour this by eating satisfying, nutrient-dense foods. Magnesium found in dark chocolate, avocado, bananas, and pumpkin seeds reduces cramps, bloating, and mood swings. Complex carbohydrates like sweet potato, oats, and brown rice help stabilize blood sugar and serotonin levels, reducing irritability. Reducing caffeine, alcohol, and processed sugar during this phase makes a noticeable difference in PMS severity for many women.</p>"
+            },
+            {
+                id: 10, title: "When to See a Doctor About Your Period", category: "Symptoms", emoji: "🩺", readTime: "5 min read",
+                description: "Know the difference between a typical cycle and a red flag that needs medical attention.",
+                content: "<p class='mb-4 text-slate-700 dark:text-slate-300'>Periods are a normal part of life — but normal does not mean you have to suffer through them. There is a wide range of what is considered a healthy menstrual cycle, but there are also clear signs that something may need medical attention. Knowing the difference between typical cycle variation and a genuine red flag is important for your long-term health.</p><p class='mb-4 text-slate-700 dark:text-slate-300'>Extremely heavy periods — medically called menorrhagia — are one of the most common reasons women seek gynecological care. If you are soaking through a pad or tampon every hour for several consecutive hours, passing large blood clots regularly, or your period lasts longer than 7 days consistently, that warrants a doctor's visit. Heavy bleeding can lead to iron-deficiency anaemia over time, causing fatigue, dizziness, and shortness of breath. It can also signal conditions like fibroids, polyps, endometriosis, or thyroid issues — all of which are very treatable once diagnosed.</p><p class='mb-4 text-slate-700 dark:text-slate-300'>Severe period pain that disrupts your daily life is not something you should simply accept. While mild cramping is normal, pain so intense that you cannot work, study, or function normally — especially if it has worsened over time — may be a sign of endometriosis, adenomyosis, or pelvic inflammatory disease. Many women with endometriosis wait years before receiving a diagnosis because they were told their pain was normal. It is not. You deserve answers and relief.</p><p class='mb-4 text-slate-700 dark:text-slate-300'>Irregular or absent periods are also worth investigating. If your cycles are consistently shorter than 21 days or longer than 35 days, highly unpredictable from month to month, or if your period has stopped entirely for 3 or more months and you are not pregnant or breastfeeding, speak to a doctor. Irregular cycles can be caused by PCOS, thyroid dysfunction, significant weight changes, excessive exercise, high stress, or early menopause — all of which benefit from early identification.</p><p class='text-slate-700 dark:text-slate-300'>Other signs that warrant medical attention include: bleeding between periods or after sex, sudden changes in your cycle after years of regularity, new or unusual vaginal discharge with odour or colour, and any unusual pelvic pain outside of your period or ovulation window. Trust yourself — you know your body better than anyone. Use FloraPulse to track your symptoms, dates, and patterns over time, then bring that data to your appointment. Having a clear record of what your cycle has been doing makes diagnosis faster and more accurate. Your health is worth advocating for.</p>"
+            }
+        ];
+
+        const categories = ["All", "Cycle Basics", "Fertility", "Pregnancy", "Symptoms", "Wellness"];
+        let currentCategory = "All";
+        let currentSearch = "";
+
+        const tabsContainer = document.getElementById('categoryTabs');
+        const gridContainer = document.getElementById('articlesGrid');
+        const searchInput = document.getElementById('searchInput');
+        const noResults = document.getElementById('noResults');
+        const modal = document.getElementById('articleModal');
+        const modalContent = document.getElementById('modalContent');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+
+        function renderTabs() {
+            tabsContainer.innerHTML = categories.map(cat => `
+                <button onclick="setCategory('${cat}')" class="whitespace-nowrap px-4 py-2 rounded-full text-sm font-medium transition-colors ${currentCategory === cat ? 'bg-rose-500 text-white' : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:border-rose-300 dark:hover:border-rose-700'}">
+                    ${cat}
+                </button>
+            `).join('');
+        }
+
+        function setCategory(cat) {
+            currentCategory = cat;
+            renderTabs();
+            renderArticles();
+        }
+
+        function renderArticles() {
+            const filtered = articles.filter(a => {
+                const matchCategory = currentCategory === "All" || a.category === currentCategory;
+                const matchSearch = a.title.toLowerCase().includes(currentSearch.toLowerCase()) || a.category.toLowerCase().includes(currentSearch.toLowerCase());
+                return matchCategory && matchSearch;
+            });
+
+            if (filtered.length === 0) {
+                gridContainer.innerHTML = '';
+                noResults.classList.remove('hidden');
+            } else {
+                noResults.classList.add('hidden');
+                gridContainer.innerHTML = filtered.map(a => `
+                    <div onclick="openArticle(${a.id})" class="group bg-white dark:bg-slate-800 rounded-2xl p-5 border border-slate-100 dark:border-slate-700 shadow-sm hover:shadow-md transition-all cursor-pointer flex flex-col h-full">
+                        <div class="flex gap-4 items-start mb-4">
+                            <div class="text-4xl bg-rose-50 dark:bg-slate-700 w-16 h-16 rounded-xl flex items-center justify-center flex-shrink-0">
+                                ${a.emoji}
+                            </div>
+                            <div class="flex-grow">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <span class="text-xs font-semibold text-rose-500 dark:text-rose-400 uppercase tracking-wider">${a.category}</span>
+                                    <span class="text-xs text-slate-400 dark:text-slate-500">&bull; ${a.readTime}</span>
+                                </div>
+                                <h3 class="text-lg font-bold text-slate-800 dark:text-slate-100 leading-tight">${a.title}</h3>
+                            </div>
+                        </div>
+                        <p class="text-sm text-slate-600 dark:text-slate-400 line-clamp-2 mb-4 flex-grow">${a.description}</p>
+                        <div class="mt-auto flex items-center text-sm font-medium text-rose-500 dark:text-rose-400 group-hover:text-rose-600 dark:group-hover:text-rose-300 transition-colors">
+                            Read Article <span class="ml-1 transform group-hover:translate-x-1 transition-transform">&rarr;</span>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function openArticle(id) {
+            const article = articles.find(a => a.id === id);
+            if (!article) return;
+
+            modalContent.innerHTML = `
+                <div class="text-6xl mb-6 text-center">${article.emoji}</div>
+                <div class="flex justify-center items-center gap-2 mb-4">
+                    <span class="px-3 py-1 bg-rose-100 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400 text-xs font-bold uppercase tracking-wider rounded-full">${article.category}</span>
+                    <span class="text-sm text-slate-500 dark:text-slate-400">${article.readTime}</span>
+                </div>
+                <h2 class="text-3xl font-bold text-slate-800 dark:text-slate-100 mb-8 text-center leading-tight">${article.title}</h2>
+                <div class="prose prose-rose dark:prose-invert max-w-none">
+                    ${article.content}
+                </div>
+            `;
+            
+            modal.classList.remove('hidden');
+            void modal.offsetWidth;
+            modal.classList.remove('opacity-0');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeArticle() {
+            modal.classList.add('opacity-0');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                document.body.style.overflow = '';
+            }, 300);
+        }
+
+        searchInput.addEventListener('input', (e) => {
+            currentSearch = e.target.value;
+            renderArticles();
+        });
+
+        closeModalBtn.addEventListener('click', closeArticle);
+
+        renderTabs();
+        renderArticles();
+    </script>
+</body>
+</html>

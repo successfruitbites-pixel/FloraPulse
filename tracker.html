@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Tracker - FloraPulse</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = { darkMode: 'class' }
+        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+        function toggleTheme() {
+            document.documentElement.classList.toggle('dark');
+            localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 min-h-screen transition-colors duration-200">
+    <div class="max-w-md mx-auto p-4 sm:p-6 pb-24">
+        <!-- Header -->
+        <header class="flex justify-between items-center mb-6">
+            <a href="index.html" class="text-rose-500 hover:text-rose-600 font-medium flex items-center gap-1">
+                &larr; Back
+            </a>
+            <button onclick="toggleTheme()" class="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors" aria-label="Toggle dark mode">
+                <span class="dark:hidden text-xl">🌙</span>
+                <span class="hidden dark:inline text-xl">☀️</span>
+            </button>
+        </header>
+
+        <h1 class="text-2xl font-bold mb-6 text-center">Daily Tracker</h1>
+
+        <!-- 7-Day History -->
+        <div class="mb-6">
+            <h2 class="text-sm font-semibold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">Last 7 Days</h2>
+            <div id="historyStrip" class="flex gap-3 overflow-x-auto hide-scrollbar pb-2">
+                <!-- Populated by JS -->
+            </div>
+        </div>
+
+        <!-- Date Navigation -->
+        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm p-4 mb-6 flex items-center justify-between border border-rose-100 dark:border-slate-700">
+            <button onclick="changeDate(-1)" class="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-full text-slate-500">&larr;</button>
+            <div class="text-center">
+                <div id="currentDateDisplay" class="font-semibold text-lg">Today</div>
+                <div id="cycleDayDisplay" class="text-sm text-rose-500 font-medium">Cycle Day --</div>
+            </div>
+            <button onclick="changeDate(1)" class="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-full text-slate-500">&rarr;</button>
+        </div>
+
+        <!-- Physical Symptoms -->
+        <section class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm p-5 mb-6 border border-rose-100 dark:border-slate-700">
+            <h2 class="text-lg font-semibold mb-4 flex items-center gap-2"><span>🩸</span> Physical Symptoms</h2>
+            
+            <div class="mb-5">
+                <label class="block text-sm font-medium mb-2">Flow Intensity</label>
+                <div class="grid grid-cols-4 gap-2" id="flowOptions">
+                    <button onclick="setFlow('None')" class="flow-btn py-2 rounded-xl border border-slate-200 dark:border-slate-600 text-sm hover:bg-rose-50 dark:hover:bg-slate-700 transition-colors" data-val="None">None</button>
+                    <button onclick="setFlow('Light')" class="flow-btn py-2 rounded-xl border border-slate-200 dark:border-slate-600 text-sm hover:bg-rose-50 dark:hover:bg-slate-700 transition-colors" data-val="Light">Light</button>
+                    <button onclick="setFlow('Medium')" class="flow-btn py-2 rounded-xl border border-slate-200 dark:border-slate-600 text-sm hover:bg-rose-50 dark:hover:bg-slate-700 transition-colors" data-val="Medium">Medium</button>
+                    <button onclick="setFlow('Heavy')" class="flow-btn py-2 rounded-xl border border-slate-200 dark:border-slate-600 text-sm hover:bg-rose-50 dark:hover:bg-slate-700 transition-colors" data-val="Heavy">Heavy</button>
+                </div>
+            </div>
+
+            <div class="mb-5">
+                <label class="block text-sm font-medium mb-2 flex justify-between">
+                    <span>Pain Level</span>
+                    <span id="painValue" class="text-rose-500 font-bold">0</span>
+                </label>
+                <input type="range" id="painSlider" min="0" max="10" value="0" class="w-full accent-rose-500" oninput="updatePain(this.value)">
+                <div class="flex justify-between text-xs text-slate-500 mt-1">
+                    <span>None</span>
+                    <span>Severe</span>
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium mb-2">Symptoms</label>
+                <div class="flex flex-wrap gap-2" id="symptomChecklist">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Mood & Emotions -->
+        <section class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm p-5 mb-6 border border-rose-100 dark:border-slate-700">
+            <h2 class="text-lg font-semibold mb-4 flex items-center gap-2"><span>✨</span> Mood & Emotions</h2>
+            <div class="grid grid-cols-4 gap-3" id="moodGrid">
+                <!-- Populated by JS -->
+            </div>
+        </section>
+
+        <!-- Lifestyle Factors -->
+        <section class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm p-5 mb-6 border border-rose-100 dark:border-slate-700">
+            <h2 class="text-lg font-semibold mb-4 flex items-center gap-2"><span>🌱</span> Lifestyle</h2>
+            
+            <div class="mb-5">
+                <label class="block text-sm font-medium mb-2 flex justify-between">
+                    <span>Sleep</span>
+                    <span id="sleepValue" class="text-rose-500 font-bold">8h</span>
+                </label>
+                <input type="range" id="sleepSlider" min="4" max="12" step="0.5" value="8" class="w-full accent-rose-500" oninput="updateSleep(this.value)">
+            </div>
+
+            <div class="mb-5">
+                <label class="block text-sm font-medium mb-2">Exercise</label>
+                <div class="grid grid-cols-4 gap-2" id="exerciseOptions">
+                    <button onclick="setExercise('None')" class="exercise-btn py-2 rounded-xl border border-slate-200 dark:border-slate-600 text-sm hover:bg-rose-50 dark:hover:bg-slate-700 transition-colors" data-val="None">None</button>
+                    <button onclick="setExercise('Light')" class="exercise-btn py-2 rounded-xl border border-slate-200 dark:border-slate-600 text-sm hover:bg-rose-50 dark:hover:bg-slate-700 transition-colors" data-val="Light">Light</button>
+                    <button onclick="setExercise('Moderate')" class="exercise-btn py-2 rounded-xl border border-slate-200 dark:border-slate-600 text-sm hover:bg-rose-50 dark:hover:bg-slate-700 transition-colors" data-val="Moderate">Moderate</button>
+                    <button onclick="setExercise('Intense')" class="exercise-btn py-2 rounded-xl border border-slate-200 dark:border-slate-600 text-sm hover:bg-rose-50 dark:hover:bg-slate-700 transition-colors" data-val="Intense">Intense</button>
+                </div>
+            </div>
+
+            <div class="mb-5">
+                <label class="block text-sm font-medium mb-2">Water Intake (Glasses)</label>
+                <div class="flex justify-between items-center bg-slate-50 dark:bg-slate-700 rounded-xl p-2">
+                    <button onclick="updateWater(-1)" class="w-10 h-10 rounded-lg bg-white dark:bg-slate-600 shadow-sm text-xl">&minus;</button>
+                    <span id="waterValue" class="text-xl font-bold text-blue-500">4</span>
+                    <button onclick="updateWater(1)" class="w-10 h-10 rounded-lg bg-white dark:bg-slate-600 shadow-sm text-xl">&plus;</button>
+                </div>
+            </div>
+
+            <div class="mb-5 flex items-center justify-between">
+                <label class="text-sm font-medium">Sexual Activity</label>
+                <button id="sexToggle" onclick="toggleSex()" class="w-12 h-6 rounded-full bg-slate-300 dark:bg-slate-600 relative transition-colors duration-300">
+                    <div id="sexToggleKnob" class="w-5 h-5 bg-white rounded-full absolute top-0.5 left-0.5 transition-transform duration-300"></div>
+                </button>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium mb-2">Medication / Supplements</label>
+                <input type="text" id="medicationInput" onchange="saveData()" placeholder="e.g. Ibuprofen, Vitamins" class="w-full bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-rose-500">
+            </div>
+        </section>
+
+        <!-- Summary -->
+        <section class="bg-gradient-to-br from-rose-50 to-orange-50 dark:from-slate-800 dark:to-slate-800 rounded-2xl shadow-sm p-5 border border-rose-100 dark:border-slate-700">
+            <h2 class="text-lg font-semibold mb-2">Today's Summary</h2>
+            <p id="summaryText" class="text-slate-600 dark:text-slate-300 text-sm leading-relaxed">
+                Log some data to see your summary here.
+            </p>
+        </section>
+
+    </div>
+
+    <script>
+        // State
+        let currentDate = new Date();
+        const symptomsList = ['Bloating', 'Headache', 'Cramps', 'Fatigue', 'Breast tenderness', 'Nausea', 'Back pain', 'Acne'];
+        const moodsList = [
+            { id: 'Happy', emoji: '😊', color: 'bg-yellow-400' },
+            { id: 'Sad', emoji: '😔', color: 'bg-blue-400' },
+            { id: 'Irritable', emoji: '😤', color: 'bg-red-400' },
+            { id: 'Anxious', emoji: '😰', color: 'bg-purple-400' },
+            { id: 'Tired', emoji: '😴', color: 'bg-slate-400' },
+            { id: 'Energetic', emoji: '🤩', color: 'bg-orange-400' },
+            { id: 'Calm', emoji: '😌', color: 'bg-green-400' },
+            { id: 'Emotional', emoji: '😢', color: 'bg-teal-400' }
+        ];
+
+        let currentData = {
+            symptoms: { flow: 'None', pain: 0, list: [] },
+            moods: [],
+            lifestyle: { sleep: 8, exercise: 'None', water: 4, sex: false, meds: '' }
+        };
+
+        // Initialize UI
+        function init() {
+            renderSymptomChecklist();
+            renderMoodGrid();
+            loadDataForDate(currentDate);
+            renderHistoryStrip();
+        }
+
+        // Date Utils
+        function formatDateString(date) {
+            const d = new Date(date);
+            d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+            return d.toISOString().split('T')[0];
+        }
+
+        function changeDate(days) {
+            currentDate.setDate(currentDate.getDate() + days);
+            loadDataForDate(currentDate);
+        }
+
+        function updateDateDisplay() {
+            const today = new Date();
+            const isToday = currentDate.toDateString() === today.toDateString();
+            
+            const options = { weekday: 'short', month: 'short', day: 'numeric' };
+            document.getElementById('currentDateDisplay').textContent = isToday ? 'Today' : currentDate.toLocaleDateString('en-US', options);
+
+            // Calculate Cycle Day
+            const lastPeriodStr = localStorage.getItem('lastPeriodDate');
+            if (lastPeriodStr) {
+                const lastPeriod = new Date(lastPeriodStr);
+                const diffTime = currentDate.getTime() - lastPeriod.getTime();
+                const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1;
+                
+                if (diffDays > 0 && diffDays <= 100) {
+                    document.getElementById('cycleDayDisplay').textContent = `Cycle Day ${diffDays}`;
+                } else {
+                    document.getElementById('cycleDayDisplay').textContent = 'Cycle Day --';
+                }
+            }
+        }
+
+        // Renderers
+        function renderSymptomChecklist() {
+            const container = document.getElementById('symptomChecklist');
+            container.innerHTML = symptomsList.map(sym => `
+                <button onclick="toggleSymptom('${sym}')" id="sym-${sym.replace(/\s+/g, '')}" class="px-3 py-1.5 rounded-full border border-slate-200 dark:border-slate-600 text-sm hover:bg-rose-50 dark:hover:bg-slate-700 transition-colors">
+                    ${sym}
+                </button>
+            `).join('');
+        }
+
+        function renderMoodGrid() {
+            const container = document.getElementById('moodGrid');
+            container.innerHTML = moodsList.map(m => `
+                <button onclick="toggleMood('${m.id}')" id="mood-${m.id}" class="flex flex-col items-center p-2 rounded-xl border border-slate-200 dark:border-slate-600 hover:bg-rose-50 dark:hover:bg-slate-700 transition-colors">
+                    <span class="text-2xl mb-1">${m.emoji}</span>
+                    <span class="text-xs text-slate-600 dark:text-slate-400">${m.id}</span>
+                </button>
+            `).join('');
+        }
+
+        function renderHistoryStrip() {
+            const container = document.getElementById('historyStrip');
+            let html = '';
+            const today = new Date();
+            
+            const moodLogs = JSON.parse(localStorage.getItem('moodLogs') || '{}');
+
+            for (let i = 6; i >= 0; i--) {
+                const d = new Date(today);
+                d.setDate(d.getDate() - i);
+                const dateStr = formatDateString(d);
+                const isToday = i === 0;
+                
+                let dotColor = 'bg-slate-200 dark:bg-slate-700';
+                if (moodLogs[dateStr] && moodLogs[dateStr].length > 0) {
+                    const primaryMood = moodsList.find(m => m.id === moodLogs[dateStr][0]);
+                    if (primaryMood) dotColor = primaryMood.color;
+                }
+
+                html += `
+                    <button onclick="goToDate('${dateStr}')" class="flex flex-col items-center min-w-[3rem] p-2 rounded-xl ${isToday ? 'bg-rose-50 dark:bg-slate-700 border border-rose-200 dark:border-slate-600' : ''}">
+                        <span class="text-xs text-slate-500 mb-1">${d.toLocaleDateString('en-US', {weekday: 'narrow'})}</span>
+                        <span class="text-sm font-semibold mb-1">${d.getDate()}</span>
+                        <div class="w-2 h-2 rounded-full ${dotColor}"></div>
+                    </button>
+                `;
+            }
+            container.innerHTML = html;
+        }
+
+        function goToDate(dateStr) {
+            const parts = dateStr.split('-');
+            currentDate = new Date(parts[0], parts[1] - 1, parts[2]);
+            loadDataForDate(currentDate);
+        }
+
+        // Data Management
+        function loadDataForDate(date) {
+            updateDateDisplay();
+            const dateStr = formatDateString(date);
+            
+            const symptomLogs = JSON.parse(localStorage.getItem('symptomLogs') || '{}');
+            const moodLogs = JSON.parse(localStorage.getItem('moodLogs') || '{}');
+            const lifestyleLogs = JSON.parse(localStorage.getItem('lifestyleLogs') || '{}');
+
+            currentData.symptoms = symptomLogs[dateStr] || { flow: 'None', pain: 0, list: [] };
+            currentData.moods = moodLogs[dateStr] || [];
+            currentData.lifestyle = lifestyleLogs[dateStr] || { sleep: 8, exercise: 'None', water: 4, sex: false, meds: '' };
+
+            updateUIFromData();
+            updateSummary();
+        }
+
+        function saveData() {
+            const dateStr = formatDateString(currentDate);
+            
+            const symptomLogs = JSON.parse(localStorage.getItem('symptomLogs') || '{}');
+            const moodLogs = JSON.parse(localStorage.getItem('moodLogs') || '{}');
+            const lifestyleLogs = JSON.parse(localStorage.getItem('lifestyleLogs') || '{}');
+
+            symptomLogs[dateStr] = currentData.symptoms;
+            moodLogs[dateStr] = currentData.moods;
+            lifestyleLogs[dateStr] = currentData.lifestyle;
+
+            localStorage.setItem('symptomLogs', JSON.stringify(symptomLogs));
+            localStorage.setItem('moodLogs', JSON.stringify(moodLogs));
+            localStorage.setItem('lifestyleLogs', JSON.stringify(lifestyleLogs));
+
+            updateSummary();
+            renderHistoryStrip();
+        }
+
+        // UI Updaters
+        function updateUIFromData() {
+            // Flow
+            document.querySelectorAll('.flow-btn').forEach(btn => {
+                if (btn.dataset.val === currentData.symptoms.flow) {
+                    btn.classList.add('bg-rose-500', 'text-white', 'border-rose-500');
+                    btn.classList.remove('hover:bg-rose-50', 'dark:hover:bg-slate-700');
+                } else {
+                    btn.classList.remove('bg-rose-500', 'text-white', 'border-rose-500');
+                    btn.classList.add('hover:bg-rose-50', 'dark:hover:bg-slate-700');
+                }
+            });
+
+            // Pain
+            document.getElementById('painSlider').value = currentData.symptoms.pain;
+            document.getElementById('painValue').textContent = currentData.symptoms.pain;
+
+            // Symptoms
+            symptomsList.forEach(sym => {
+                const el = document.getElementById(`sym-${sym.replace(/\s+/g, '')}`);
+                if (currentData.symptoms.list.includes(sym)) {
+                    el.classList.add('bg-rose-100', 'border-rose-300', 'dark:bg-rose-900/30', 'dark:border-rose-700', 'text-rose-700', 'dark:text-rose-300');
+                } else {
+                    el.classList.remove('bg-rose-100', 'border-rose-300', 'dark:bg-rose-900/30', 'dark:border-rose-700', 'text-rose-700', 'dark:text-rose-300');
+                }
+            });
+
+            // Moods
+            moodsList.forEach(m => {
+                const el = document.getElementById(`mood-${m.id}`);
+                if (currentData.moods.includes(m.id)) {
+                    el.classList.add('bg-rose-50', 'border-rose-300', 'dark:bg-slate-700', 'dark:border-slate-500');
+                } else {
+                    el.classList.remove('bg-rose-50', 'border-rose-300', 'dark:bg-slate-700', 'dark:border-slate-500');
+                }
+            });
+
+            // Lifestyle
+            document.getElementById('sleepSlider').value = currentData.lifestyle.sleep;
+            document.getElementById('sleepValue').textContent = currentData.lifestyle.sleep + 'h';
+
+            document.querySelectorAll('.exercise-btn').forEach(btn => {
+                if (btn.dataset.val === currentData.lifestyle.exercise) {
+                    btn.classList.add('bg-rose-500', 'text-white', 'border-rose-500');
+                    btn.classList.remove('hover:bg-rose-50', 'dark:hover:bg-slate-700');
+                } else {
+                    btn.classList.remove('bg-rose-500', 'text-white', 'border-rose-500');
+                    btn.classList.add('hover:bg-rose-50', 'dark:hover:bg-slate-700');
+                }
+            });
+
+            document.getElementById('waterValue').textContent = currentData.lifestyle.water;
+            
+            const sexToggle = document.getElementById('sexToggle');
+            const sexKnob = document.getElementById('sexToggleKnob');
+            if (currentData.lifestyle.sex) {
+                sexToggle.classList.replace('bg-slate-300', 'bg-rose-500');
+                sexToggle.classList.replace('dark:bg-slate-600', 'bg-rose-500');
+                sexKnob.classList.add('translate-x-6');
+            } else {
+                sexToggle.classList.replace('bg-rose-500', 'bg-slate-300');
+                sexToggle.classList.replace('bg-rose-500', 'dark:bg-slate-600');
+                sexKnob.classList.remove('translate-x-6');
+            }
+
+            document.getElementById('medicationInput').value = currentData.lifestyle.meds || '';
+        }
+
+        function updateSummary() {
+            const parts = [];
+            
+            // Symptoms
+            if (currentData.symptoms.flow !== 'None') parts.push(`${currentData.symptoms.flow.toLowerCase()} flow`);
+            if (currentData.symptoms.pain > 0) parts.push(`pain level ${currentData.symptoms.pain}`);
+            if (currentData.symptoms.list.length > 0) parts.push(`${currentData.symptoms.list.length} symptom(s)`);
+            
+            // Moods
+            if (currentData.moods.length > 0) parts.push(`felt ${currentData.moods.join(', ').toLowerCase()}`);
+            
+            // Lifestyle
+            parts.push(`slept ${currentData.lifestyle.sleep}h`);
+            if (currentData.lifestyle.exercise !== 'None') parts.push(`${currentData.lifestyle.exercise.toLowerCase()} exercise`);
+            parts.push(`${currentData.lifestyle.water} glasses of water`);
+            if (currentData.lifestyle.sex) parts.push(`sexual activity`);
+            if (currentData.lifestyle.meds) parts.push(`took meds`);
+
+            const summaryEl = document.getElementById('summaryText');
+            if (parts.length === 0 || (parts.length === 2 && currentData.lifestyle.sleep === 8 && currentData.lifestyle.water === 4 && currentData.symptoms.flow === 'None' && currentData.symptoms.pain == 0 && currentData.symptoms.list.length == 0 && currentData.moods.length == 0 && currentData.lifestyle.exercise == 'None' && !currentData.lifestyle.sex && !currentData.lifestyle.meds)) {
+                // Basically empty state
+                summaryEl.textContent = "Log some data to see your summary here.";
+            } else {
+                summaryEl.textContent = "You logged: " + parts.join(', ') + ".";
+            }
+        }
+
+        // Interaction Handlers
+        function setFlow(val) { currentData.symptoms.flow = val; updateUIFromData(); saveData(); }
+        function updatePain(val) { currentData.symptoms.pain = parseInt(val); updateUIFromData(); saveData(); }
+        function toggleSymptom(sym) {
+            const idx = currentData.symptoms.list.indexOf(sym);
+            if (idx > -1) currentData.symptoms.list.splice(idx, 1);
+            else currentData.symptoms.list.push(sym);
+            updateUIFromData(); saveData();
+        }
+        function toggleMood(mood) {
+            const idx = currentData.moods.indexOf(mood);
+            if (idx > -1) currentData.moods.splice(idx, 1);
+            else currentData.moods.push(mood);
+            updateUIFromData(); saveData();
+        }
+        function updateSleep(val) { currentData.lifestyle.sleep = parseFloat(val); updateUIFromData(); saveData(); }
+        function setExercise(val) { currentData.lifestyle.exercise = val; updateUIFromData(); saveData(); }
+        function updateWater(delta) {
+            let newVal = currentData.lifestyle.water + delta;
+            if (newVal < 0) newVal = 0;
+            if (newVal > 20) newVal = 20;
+            currentData.lifestyle.water = newVal;
+            updateUIFromData(); saveData();
+        }
+        function toggleSex() {
+            currentData.lifestyle.sex = !currentData.lifestyle.sex;
+            updateUIFromData(); saveData();
+        }
+        document.getElementById('medicationInput').addEventListener('input', (e) => {
+            currentData.lifestyle.meds = e.target.value;
+        });
+
+        // Start
+        init();
+    </script>
+</body>
+</html>

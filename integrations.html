@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Integrations - FloraPulse</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        rose: { 50: '#fff1f2', 100: '#ffe4e6', 400: '#fb7185', 500: '#f43f5e', 600: '#e11d48' }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { -webkit-tap-highlight-color: transparent; }
+    </style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 font-sans antialiased pb-20 transition-colors duration-300">
+    <!-- Header -->
+    <header class="bg-white dark:bg-slate-800 shadow-sm sticky top-0 z-10 transition-colors duration-300">
+        <div class="max-w-md mx-auto px-4 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <a href="index.html" class="p-2 -ml-2 text-slate-500 hover:text-rose-500 dark:text-slate-400 dark:hover:text-rose-400 transition-colors rounded-full hover:bg-rose-50 dark:hover:bg-slate-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                </a>
+                <h1 class="text-xl font-semibold text-slate-800 dark:text-white">Integrations</h1>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-md mx-auto p-4 space-y-6">
+        <!-- Google Fit Card -->
+        <section class="bg-white dark:bg-slate-800 rounded-2xl p-5 shadow-sm border border-slate-100 dark:border-slate-700 transition-colors duration-300">
+            <div class="flex items-start gap-4 mb-4">
+                <div class="w-12 h-12 rounded-full bg-green-50 dark:bg-green-900/30 flex items-center justify-center flex-shrink-0">
+                    <span class="text-2xl">💚</span>
+                </div>
+                <div class="flex-grow">
+                    <div class="flex justify-between items-start">
+                        <h2 class="text-lg font-semibold text-slate-800 dark:text-white">Google Fit</h2>
+                        <span id="gfitStatus" class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300">Not Connected</span>
+                    </div>
+                    <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Sync your period dates and cycle length automatically.</p>
+                </div>
+            </div>
+            
+            <div class="space-y-3">
+                <div id="gfitActions" class="flex gap-2">
+                    <button id="btnConnectGFit" class="flex-1 bg-green-600 hover:bg-green-700 text-white py-2.5 rounded-xl font-medium transition-colors">Connect</button>
+                </div>
+                <div id="gfitConnectedActions" class="hidden space-y-3">
+                    <div class="flex justify-between items-center text-sm">
+                        <span class="text-slate-500 dark:text-slate-400">Last synced:</span>
+                        <span id="gfitLastSync" class="font-medium text-slate-700 dark:text-slate-300">Never</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <button id="btnSyncGFit" class="flex-1 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 py-2.5 rounded-xl font-medium transition-colors">Sync Now</button>
+                        <button id="btnDisconnectGFit" class="px-4 bg-red-50 hover:bg-red-100 dark:bg-red-900/20 dark:hover:bg-red-900/40 text-red-600 dark:text-red-400 py-2.5 rounded-xl font-medium transition-colors">Disconnect</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Apple Health Card -->
+        <section class="bg-white dark:bg-slate-800 rounded-2xl p-5 shadow-sm border border-slate-100 dark:border-slate-700 transition-colors duration-300">
+            <div class="flex items-start gap-4 mb-4">
+                <div class="w-12 h-12 rounded-full bg-rose-50 dark:bg-rose-900/30 flex items-center justify-center flex-shrink-0">
+                    <span class="text-2xl">🍎</span>
+                </div>
+                <div class="flex-grow">
+                    <div class="flex justify-between items-start">
+                        <h2 class="text-lg font-semibold text-slate-800 dark:text-white">Apple Health</h2>
+                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300">Manual</span>
+                    </div>
+                    <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Export your data to import into Apple Health.</p>
+                </div>
+            </div>
+            
+            <div class="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4 mb-4">
+                <p class="text-sm text-blue-800 dark:text-blue-300 mb-2">
+                    <strong>Note:</strong> Apple Health only supports direct syncing from native iOS apps. As a web app, FloraPulse provides a CSV export that you can use for your records or manual entry.
+                </p>
+                <div class="text-sm text-blue-800 dark:text-blue-300 space-y-1">
+                    <p class="font-semibold">How to import manually:</p>
+                    <ol class="list-decimal list-inside pl-1 space-y-1">
+                        <li>Tap <strong>Export CSV</strong> below and save the file to your iPhone.</li>
+                        <li>Open the <strong>Health</strong> app on your iPhone.</li>
+                        <li>Tap <strong>Browse</strong> > <strong>Cycle Tracking</strong>.</li>
+                        <li>Tap <strong>Add Data</strong> in the top right corner.</li>
+                        <li>Use your exported CSV as a reference to log your dates.</li>
+                    </ol>
+                </div>
+            </div>
+
+            <button id="btnExportAppleHealth" class="w-full bg-slate-800 hover:bg-slate-900 dark:bg-slate-700 dark:hover:bg-slate-600 text-white py-2.5 rounded-xl font-medium transition-colors flex justify-center items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+                Export CSV for Apple Health
+            </button>
+        </section>
+
+        <!-- Data Export / Import (Universal) -->
+        <section class="bg-white dark:bg-slate-800 rounded-2xl p-5 shadow-sm border border-slate-100 dark:border-slate-700 transition-colors duration-300">
+            <h2 class="text-lg font-semibold text-slate-800 dark:text-white mb-4">Export & Backup Data</h2>
+            <p class="text-sm text-slate-500 dark:text-slate-400 mb-4">Download your data for your own records or to restore on another device.</p>
+            
+            <div class="space-y-3">
+                <button id="btnExportCSV" class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 py-2.5 rounded-xl font-medium transition-colors flex justify-center items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" x2="8" y1="13" y2="13"/><line x1="16" x2="8" y1="17" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                    Export All Data (CSV)
+                </button>
+                <button id="btnExportJSON" class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 py-2.5 rounded-xl font-medium transition-colors flex justify-center items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+                    Backup Data (JSON)
+                </button>
+                
+                <div class="relative pt-2">
+                    <div class="absolute inset-0 flex items-center" aria-hidden="true">
+                        <div class="w-full border-t border-slate-200 dark:border-slate-700"></div>
+                    </div>
+                    <div class="relative flex justify-center">
+                        <span class="bg-white dark:bg-slate-800 px-2 text-xs text-slate-500">OR</span>
+                    </div>
+                </div>
+
+                <div>
+                    <input type="file" id="importFile" accept=".json" class="hidden">
+                    <button id="btnImportJSON" class="w-full bg-rose-50 hover:bg-rose-100 dark:bg-rose-900/20 dark:hover:bg-rose-900/40 text-rose-600 dark:text-rose-400 py-2.5 rounded-xl font-medium transition-colors flex justify-center items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+                        Restore Data (JSON)
+                    </button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-slate-800 text-white px-4 py-2 rounded-full shadow-lg text-sm font-medium transition-opacity duration-300 opacity-0 pointer-events-none z-50 flex items-center gap-2">
+        <span id="toastIcon">✓</span>
+        <span id="toastMessage">Action successful</span>
+    </div>
+
+    <!-- Google Identity Services -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+
+    <script>
+        // --- Theme Management ---
+        const initTheme = () => {
+            const prefs = JSON.parse(localStorage.getItem('floraPrefs') || '{"theme":"system"}');
+            const isDark = prefs.theme === 'dark' || (prefs.theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+            document.documentElement.classList.toggle('dark', isDark);
+        };
+        initTheme();
+
+        // --- Toast Notification ---
+        const showToast = (message, isError = false) => {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMessage').textContent = message;
+            document.getElementById('toastIcon').textContent = isError ? '⚠️' : '✓';
+            toast.classList.remove('bg-slate-800', 'bg-red-600');
+            toast.classList.add(isError ? 'bg-red-600' : 'bg-slate-800');
+            toast.classList.remove('opacity-0');
+            setTimeout(() => toast.classList.add('opacity-0'), 3000);
+        };
+
+        // --- Google Fit Integration ---
+        // Note: For a real app, you need a valid Google Cloud Client ID.
+        // This is a placeholder for demonstration.
+        const GOOGLE_CLIENT_ID = 'YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com';
+        const SCOPES = 'https://www.googleapis.com/auth/fitness.reproductive_health.read https://www.googleapis.com/auth/fitness.reproductive_health.write';
+        
+        let tokenClient;
+        let accessToken = null;
+
+        const updateGFitUI = () => {
+            const isConnected = localStorage.getItem('gfitConnected') === 'true';
+            const lastSync = localStorage.getItem('gfitLastSync');
+            
+            const statusBadge = document.getElementById('gfitStatus');
+            const actions = document.getElementById('gfitActions');
+            const connectedActions = document.getElementById('gfitConnectedActions');
+            
+            if (isConnected) {
+                statusBadge.textContent = 'Connected';
+                statusBadge.className = 'inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-400';
+                actions.classList.add('hidden');
+                connectedActions.classList.remove('hidden');
+                document.getElementById('gfitLastSync').textContent = lastSync ? new Date(lastSync).toLocaleString() : 'Never';
+            } else {
+                statusBadge.textContent = 'Not Connected';
+                statusBadge.className = 'inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300';
+                actions.classList.remove('hidden');
+                connectedActions.classList.add('hidden');
+            }
+        };
+
+        // Initialize Google Identity Services
+        window.onload = function () {
+            if (window.google && window.google.accounts) {
+                tokenClient = google.accounts.oauth2.initTokenClient({
+                    client_id: GOOGLE_CLIENT_ID,
+                    scope: SCOPES,
+                    callback: (tokenResponse) => {
+                        if (tokenResponse && tokenResponse.access_token) {
+                            accessToken = tokenResponse.access_token;
+                            localStorage.setItem('gfitConnected', 'true');
+                            updateGFitUI();
+                            syncToGoogleFit();
+                        }
+                    },
+                });
+            }
+            updateGFitUI();
+        };
+
+        document.getElementById('btnConnectGFit').addEventListener('click', () => {
+            if (GOOGLE_CLIENT_ID === 'YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com') {
+                // Mock connection for preview environment
+                localStorage.setItem('gfitConnected', 'true');
+                updateGFitUI();
+                syncToGoogleFitMock();
+                return;
+            }
+            if (tokenClient) {
+                tokenClient.requestAccessToken();
+            } else {
+                showToast('Google Fit SDK not loaded', true);
+            }
+        });
+
+        document.getElementById('btnDisconnectGFit').addEventListener('click', () => {
+            localStorage.removeItem('gfitConnected');
+            localStorage.removeItem('gfitLastSync');
+            accessToken = null;
+            updateGFitUI();
+            showToast('Disconnected from Google Fit');
+        });
+
+        document.getElementById('btnSyncGFit').addEventListener('click', () => {
+            if (GOOGLE_CLIENT_ID === 'YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com') {
+                syncToGoogleFitMock();
+                return;
+            }
+            if (!accessToken) {
+                tokenClient.requestAccessToken();
+            } else {
+                syncToGoogleFit();
+            }
+        });
+
+        const syncToGoogleFitMock = () => {
+            showToast('Syncing to Google Fit...');
+            setTimeout(() => {
+                localStorage.setItem('gfitLastSync', new Date().toISOString());
+                updateGFitUI();
+                showToast('Successfully synced to Google Fit');
+            }, 1000);
+        };
+
+        const syncToGoogleFit = async () => {
+            if (!accessToken) return;
+            
+            showToast('Syncing to Google Fit...');
+            
+            try {
+                const lastPeriodDate = localStorage.getItem('lastPeriodDate');
+                const cycleLength = parseInt(localStorage.getItem('cycleLength') || '28', 10);
+                
+                if (!lastPeriodDate) {
+                    showToast('No period data to sync', true);
+                    return;
+                }
+
+                // Convert date to nanoseconds
+                const [year, month, day] = lastPeriodDate.split('-').map(Number);
+                const startTimeMillis = new Date(year, month - 1, day).getTime();
+                const endTimeMillis = startTimeMillis + (1000 * 60 * 60 * 24); // 1 day duration
+                const startTimeNanos = startTimeMillis * 1000000;
+                const endTimeNanos = endTimeMillis * 1000000;
+
+                // 1. Create Data Source for Menstruation
+                const dataSourceMenstruation = {
+                    "dataStreamName": "FloraPulseMenstruation",
+                    "type": "raw",
+                    "application": { "name": "FloraPulse" },
+                    "dataType": {
+                        "name": "com.google.menstruation",
+                        "field": [
+                            { "name": "menstrual_flow", "format": "integer" }
+                        ]
+                    }
+                };
+
+                const resSource = await fetch('https://www.googleapis.com/fitness/v1/users/me/dataSources', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(dataSourceMenstruation)
+                });
+                
+                let sourceId = '';
+                if (resSource.ok) {
+                    const data = await resSource.json();
+                    sourceId = data.dataStreamId;
+                } else if (resSource.status === 409) {
+                    // Already exists, construct the ID
+                    sourceId = `raw:com.google.menstruation:YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com:FloraPulseMenstruation`;
+                } else {
+                    throw new Error('Failed to create data source');
+                }
+
+                // 2. Patch Data Point for Menstruation
+                const datasetId = `${startTimeNanos}-${endTimeNanos}`;
+                const dataPoint = {
+                    "minStartTimeNs": startTimeNanos.toString(),
+                    "maxEndTimeNs": endTimeNanos.toString(),
+                    "dataSourceId": sourceId,
+                    "point": [
+                        {
+                            "startTimeNanos": startTimeNanos.toString(),
+                            "endTimeNanos": endTimeNanos.toString(),
+                            "dataTypeName": "com.google.menstruation",
+                            "value": [{ "intVal": 2 }] // 2 = Medium flow
+                        }
+                    ]
+                };
+
+                await fetch(`https://www.googleapis.com/fitness/v1/users/me/dataSources/${sourceId}/datasets/${datasetId}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(dataPoint)
+                });
+
+                // 3. Create Custom Data Source for Cycle Length
+                const dataSourceCycle = {
+                    "dataStreamName": "FloraPulseCycleLength",
+                    "type": "raw",
+                    "application": { "name": "FloraPulse" },
+                    "dataType": {
+                        "name": "com.florapulse.cycle_length",
+                        "field": [
+                            { "name": "days", "format": "integer" }
+                        ]
+                    }
+                };
+
+                const resCycleSource = await fetch('https://www.googleapis.com/fitness/v1/users/me/dataSources', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(dataSourceCycle)
+                });
+
+                let cycleSourceId = '';
+                if (resCycleSource.ok) {
+                    const data = await resCycleSource.json();
+                    cycleSourceId = data.dataStreamId;
+                } else if (resCycleSource.status === 409) {
+                    cycleSourceId = `raw:com.florapulse.cycle_length:YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com:FloraPulseCycleLength`;
+                }
+
+                if (cycleSourceId) {
+                    const cycleDataPoint = {
+                        "minStartTimeNs": startTimeNanos.toString(),
+                        "maxEndTimeNs": endTimeNanos.toString(),
+                        "dataSourceId": cycleSourceId,
+                        "point": [
+                            {
+                                "startTimeNanos": startTimeNanos.toString(),
+                                "endTimeNanos": endTimeNanos.toString(),
+                                "dataTypeName": "com.florapulse.cycle_length",
+                                "value": [{ "intVal": cycleLength }]
+                            }
+                        ]
+                    };
+
+                    await fetch(`https://www.googleapis.com/fitness/v1/users/me/dataSources/${cycleSourceId}/datasets/${datasetId}`, {
+                        method: 'PATCH',
+                        headers: {
+                            'Authorization': `Bearer ${accessToken}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(cycleDataPoint)
+                    });
+                }
+                
+                localStorage.setItem('gfitLastSync', new Date().toISOString());
+                updateGFitUI();
+                showToast('Successfully synced to Google Fit');
+            } catch (error) {
+                console.error(error);
+                showToast('Failed to sync with Google Fit', true);
+            }
+        };
+
+        // --- Data Export & Import ---
+        const getAllData = () => {
+            return {
+                lastPeriodDate: localStorage.getItem('lastPeriodDate'),
+                cycleLength: localStorage.getItem('cycleLength'),
+                floraPrefs: JSON.parse(localStorage.getItem('floraPrefs') || '{}'),
+                floraNotes: JSON.parse(localStorage.getItem('floraNotes') || '{}'),
+                cycleHistory: JSON.parse(localStorage.getItem('cycleHistory') || '[]'),
+                dashboardData: JSON.parse(localStorage.getItem('dashboardData') || '{}'),
+                symptomLogs: JSON.parse(localStorage.getItem('symptomLogs') || '[]'),
+                moodLogs: JSON.parse(localStorage.getItem('moodLogs') || '[]'),
+                lifestyleLogs: JSON.parse(localStorage.getItem('lifestyleLogs') || '[]'),
+                userProfile: JSON.parse(localStorage.getItem('userProfile') || '{}')
+            };
+        };
+
+        const downloadFile = (content, fileName, contentType) => {
+            const a = document.createElement("a");
+            const file = new Blob([content], {type: contentType});
+            a.href = URL.createObjectURL(file);
+            a.download = fileName;
+            a.click();
+            URL.revokeObjectURL(a.href);
+        };
+
+        // Export JSON
+        document.getElementById('btnExportJSON').addEventListener('click', () => {
+            const data = getAllData();
+            const json = JSON.stringify(data, null, 2);
+            const dateStr = new Date().toISOString().split('T')[0];
+            downloadFile(json, `florapulse_backup_${dateStr}.json`, 'application/json');
+            showToast('Backup downloaded');
+        });
+
+        // Export CSV
+        const generateCSV = () => {
+            const data = getAllData();
+            let csv = "Date,Type,Value,Notes\n";
+            
+            // Add Period Dates
+            if (data.lastPeriodDate) {
+                csv += `${data.lastPeriodDate},Last Period,${data.cycleLength || 28} days,\n`;
+            }
+            
+            data.cycleHistory.forEach(entry => {
+                csv += `${entry.date},Period Start,${entry.length} days,\n`;
+            });
+
+            // Add Symptoms
+            data.symptomLogs.forEach(log => {
+                csv += `${log.date},Symptom,${log.symptoms.join('; ')},${log.notes || ''}\n`;
+            });
+
+            // Add Moods
+            data.moodLogs.forEach(log => {
+                csv += `${log.date},Mood,${log.moods.join('; ')},${log.notes || ''}\n`;
+            });
+
+            // Add Notes
+            Object.keys(data.floraNotes).forEach(date => {
+                csv += `${date},Note,,${data.floraNotes[date].replace(/,/g, ';')}\n`;
+            });
+
+            return csv;
+        };
+
+        document.getElementById('btnExportCSV').addEventListener('click', () => {
+            const csv = generateCSV();
+            const dateStr = new Date().toISOString().split('T')[0];
+            downloadFile(csv, `florapulse_data_${dateStr}.csv`, 'text/csv');
+            showToast('CSV downloaded');
+        });
+
+        document.getElementById('btnExportAppleHealth').addEventListener('click', () => {
+            const csv = generateCSV();
+            const dateStr = new Date().toISOString().split('T')[0];
+            downloadFile(csv, `florapulse_apple_health_${dateStr}.csv`, 'text/csv');
+            showToast('Apple Health CSV downloaded');
+        });
+
+        // Import JSON
+        document.getElementById('btnImportJSON').addEventListener('click', () => {
+            document.getElementById('importFile').click();
+        });
+
+        document.getElementById('importFile').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                try {
+                    const data = JSON.parse(event.target.result);
+                    
+                    // Restore data
+                    if (data.lastPeriodDate) localStorage.setItem('lastPeriodDate', data.lastPeriodDate);
+                    if (data.cycleLength) localStorage.setItem('cycleLength', data.cycleLength);
+                    if (data.floraPrefs) localStorage.setItem('floraPrefs', JSON.stringify(data.floraPrefs));
+                    if (data.floraNotes) localStorage.setItem('floraNotes', JSON.stringify(data.floraNotes));
+                    if (data.cycleHistory) localStorage.setItem('cycleHistory', JSON.stringify(data.cycleHistory));
+                    if (data.dashboardData) localStorage.setItem('dashboardData', JSON.stringify(data.dashboardData));
+                    if (data.symptomLogs) localStorage.setItem('symptomLogs', JSON.stringify(data.symptomLogs));
+                    if (data.moodLogs) localStorage.setItem('moodLogs', JSON.stringify(data.moodLogs));
+                    if (data.lifestyleLogs) localStorage.setItem('lifestyleLogs', JSON.stringify(data.lifestyleLogs));
+                    if (data.userProfile) localStorage.setItem('userProfile', JSON.stringify(data.userProfile));
+                    
+                    showToast('Data restored successfully!');
+                    
+                    // Reset file input
+                    e.target.value = '';
+                } catch (error) {
+                    console.error('Import error:', error);
+                    showToast('Invalid backup file', true);
+                }
+            };
+            reader.readAsText(file);
+        });
+    </script>
+</body>
+</html>

@@ -75,9 +75,18 @@
                         <p class="text-sm text-slate-500 dark:text-slate-400 font-medium mb-1">Next Period</p>
                         <p class="text-lg font-bold text-rose-600 dark:text-rose-400" id="resNextPeriod"></p>
                     </div>
-                    <div class="p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-xl border border-yellow-100 dark:border-yellow-800/40">
-                        <p class="text-sm text-slate-500 dark:text-slate-400 font-medium mb-1">Ovulation Window</p>
-                        <p class="text-lg font-bold text-yellow-600 dark:text-yellow-400" id="resOvWindow"></p>
+                    <div class="p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-xl border border-yellow-100 dark:border-yellow-800/40 flex flex-col justify-between">
+                        <div>
+                            <p class="text-sm text-slate-500 dark:text-slate-400 font-medium mb-1">Ovulation Window</p>
+                            <p class="text-lg font-bold text-yellow-600 dark:text-yellow-400" id="resOvWindow"></p>
+                        </div>
+                        <div class="mt-3 flex items-center justify-between border-t border-yellow-200 dark:border-yellow-800/50 pt-3">
+                            <span class="text-xs font-medium text-slate-600 dark:text-slate-300">Remind me</span>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="ovulationReminderToggle" class="sr-only peer">
+                                <div class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-slate-600 peer-checked:bg-yellow-500"></div>
+                            </label>
+                        </div>
                     </div>
                     <div class="p-4 bg-orange-50 dark:bg-orange-900/20 rounded-xl border border-orange-100 dark:border-orange-800/40">
                         <div class="flex justify-between items-start mb-1">
@@ -203,6 +212,44 @@
             }
 
             form.addEventListener('submit', calculateCycle);
+
+            // Setup Ovulation Reminder Toggle
+            const ovulationToggle = document.getElementById('ovulationReminderToggle');
+            const prefs = JSON.parse(localStorage.getItem('notificationPrefs') || '{}');
+            if (prefs.ovulation) {
+                ovulationToggle.checked = true;
+            }
+
+            ovulationToggle.addEventListener('change', async (e) => {
+                const isChecked = e.target.checked;
+                
+                if (isChecked) {
+                    if (!('Notification' in window)) {
+                        alert('This browser does not support desktop notification');
+                        e.target.checked = false;
+                        return;
+                    }
+                    
+                    if (Notification.permission === 'granted') {
+                        prefs.ovulation = true;
+                        localStorage.setItem('notificationPrefs', JSON.stringify(prefs));
+                    } else if (Notification.permission !== 'denied') {
+                        const permission = await Notification.requestPermission();
+                        if (permission === 'granted') {
+                            prefs.ovulation = true;
+                            localStorage.setItem('notificationPrefs', JSON.stringify(prefs));
+                        } else {
+                            e.target.checked = false;
+                        }
+                    } else {
+                        alert('Notifications are blocked. Please enable them in your browser settings.');
+                        e.target.checked = false;
+                    }
+                } else {
+                    prefs.ovulation = false;
+                    localStorage.setItem('notificationPrefs', JSON.stringify(prefs));
+                }
+            });
         });
 
         const addDays = (date, days) => {
@@ -212,7 +259,7 @@
         };
 
         const formatDate = (date) => {
-            return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+            return date.toLocaleDateString(navigator.language, { month: 'short', day: 'numeric', timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone });
         };
 
         function calculateCycle(e) {
@@ -291,8 +338,8 @@
             if (totalDays < 35) totalDays = 35; // At least 5 weeks
 
             // Set Calendar Label
-            const startMonth = new Intl.DateTimeFormat(undefined, { month: 'long' }).format(lpd);
-            const endMonth = new Intl.DateTimeFormat(undefined, { month: 'long' }).format(nextPeriod);
+            const startMonth = new Intl.DateTimeFormat(navigator.language, { month: 'long', timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone }).format(lpd);
+            const endMonth = new Intl.DateTimeFormat(navigator.language, { month: 'long', timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone }).format(nextPeriod);
             const startYear = lpd.getFullYear();
             const endYear = nextPeriod.getFullYear();
 
@@ -309,7 +356,7 @@
             let html = '<div class="grid grid-cols-7 gap-1 md:gap-2 text-center text-sm">';
             const daysOfWeek = Array.from({length: 7}, (_, i) => {
                 const d = new Date(2024, 0, i + 7); // Jan 7, 2024 is a Sunday
-                return new Intl.DateTimeFormat(undefined, { weekday: 'short' }).format(d);
+                return new Intl.DateTimeFormat(navigator.language, { weekday: 'short', timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone }).format(d);
             });
             daysOfWeek.forEach(d => html += `<div class="font-semibold text-slate-500 dark:text-slate-400 py-2">${d}</div>`);
 
@@ -370,7 +417,7 @@
             // Format date for display
             const [year, month, day] = dateStr.split('-').map(Number);
             const dateObj = new Date(year, month - 1, day);
-            const displayDate = dateObj.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+            const displayDate = dateObj.toLocaleDateString(navigator.language, { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric', timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone });
             
             document.getElementById('modalDateTitle').innerText = displayDate;
             
@@ -451,7 +498,7 @@
             history.forEach(entry => {
                 const [year, month, day] = entry.date.split('-').map(Number);
                 const dateObj = new Date(year, month - 1, day);
-                const displayDate = dateObj.toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' });
+                const displayDate = dateObj.toLocaleDateString(navigator.language, { month: 'long', day: 'numeric', year: 'numeric', timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone });
                 
                 html += `
                     <div class="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-700/50 rounded-xl border border-slate-100 dark:border-slate-700">

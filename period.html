@@ -155,10 +155,11 @@
 
             // Format date helper (e.g., "15 April 2025")
             const formatDate = (date) => {
-                return new Intl.DateTimeFormat(undefined, { 
+                return new Intl.DateTimeFormat(navigator.language, { 
                     day: 'numeric', 
                     month: 'long', 
-                    year: 'numeric' 
+                    year: 'numeric',
+                    timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone
                 }).format(date);
             };
 
