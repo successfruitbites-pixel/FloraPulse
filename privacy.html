@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy - FloraPulse</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+        }
+        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+        function toggleTheme() {
+            if (document.documentElement.classList.contains('dark')) {
+                document.documentElement.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+            } else {
+                document.documentElement.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-rose-50 dark:bg-slate-900 min-h-screen flex flex-col items-center py-8 px-4 transition-colors duration-200">
+    <div class="w-full max-w-[480px] md:max-w-2xl mx-auto flex-grow flex flex-col">
+        <!-- Top Navigation -->
+        <div class="w-full flex justify-between items-center mb-6">
+            <a href="index.html" class="text-rose-500 hover:text-rose-600 dark:text-rose-400 dark:hover:text-rose-300 font-medium inline-block transition-colors">&larr; Back to Home</a>
+            <button onclick="toggleTheme()" class="text-slate-500 hover:text-rose-500 dark:text-slate-400 dark:hover:text-rose-400 transition-colors p-2 rounded-full hover:bg-rose-100/50 dark:hover:bg-slate-800" aria-label="Toggle Dark Mode">
+                <svg class="w-5 h-5 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                <svg class="w-5 h-5 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+            </button>
+        </div>
+
+        <!-- Header -->
+        <header class="text-center mb-8">
+            <h1 class="text-3xl md:text-4xl font-bold text-rose-500 dark:text-rose-400 mb-2 tracking-tight">Privacy Policy</h1>
+            <p class="text-slate-600 dark:text-slate-300 font-medium">How we handle your data</p>
+        </header>
+
+        <!-- Content Card -->
+        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm p-6 md:p-8 border border-rose-100 dark:border-slate-700 mb-8 prose prose-slate dark:prose-invert max-w-none">
+            <h2 class="text-xl font-semibold text-slate-800 dark:text-slate-100 mb-4">Your Data Stays on Your Device</h2>
+            <p class="text-slate-600 dark:text-slate-300 mb-4 leading-relaxed">
+                At FloraPulse, we believe your health data is deeply personal. That's why <strong>we do not collect, store, or transmit any of your personal health information to our servers.</strong>
+            </p>
+            
+            <h3 class="text-lg font-semibold text-slate-800 dark:text-slate-100 mt-6 mb-3">How Data is Stored</h3>
+            <p class="text-slate-600 dark:text-slate-300 mb-4 leading-relaxed">
+                All information you enter into FloraPulse—including your last period date, cycle length, and personal notes—is saved exclusively in your browser's local storage (<code>localStorage</code>). This means your data never leaves your device.
+            </p>
+
+            <h3 class="text-lg font-semibold text-slate-800 dark:text-slate-100 mt-6 mb-3">Third-Party Services</h3>
+            <p class="text-slate-600 dark:text-slate-300 mb-4 leading-relaxed">
+                We do not use any third-party tracking, analytics, or advertising scripts that could monitor your usage or access your health data.
+            </p>
+
+            <h3 class="text-lg font-semibold text-slate-800 dark:text-slate-100 mt-6 mb-3">Clearing Your Data</h3>
+            <p class="text-slate-600 dark:text-slate-300 mb-4 leading-relaxed">
+                Because your data is stored locally, you have complete control over it. You can delete all your FloraPulse data at any time by clearing your browser's site data or cache.
+            </p>
+
+            <h3 class="text-lg font-semibold text-slate-800 dark:text-slate-100 mt-6 mb-3">Changes to This Policy</h3>
+            <p class="text-slate-600 dark:text-slate-300 leading-relaxed">
+                If we ever change how we handle data (for example, if we introduce an optional cloud sync feature in the future), we will update this policy and ask for your explicit consent before any data leaves your device.
+            </p>
+        </div>
+
+        <!-- Footer -->
+        <footer class="mt-auto text-center pt-4 pb-4">
+            <p class="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto leading-relaxed">
+                This tool is for planning purposes only and is not a substitute for medical advice.
+            </p>
+        </footer>
+    </div>
+</body>
+</html>

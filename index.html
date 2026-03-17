@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FloraPulse</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+        }
+        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+        function toggleTheme() {
+            if (document.documentElement.classList.contains('dark')) {
+                document.documentElement.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+            } else {
+                document.documentElement.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-rose-50 dark:bg-slate-900 min-h-screen flex flex-col items-center py-12 px-4 transition-colors duration-200">
+    <div class="w-full max-w-[480px] md:max-w-4xl mx-auto flex-grow flex flex-col">
+        <!-- Top Navigation -->
+        <div class="w-full flex justify-between items-center mb-4">
+            <button onclick="toggleTheme()" class="text-slate-500 hover:text-rose-500 dark:text-slate-400 dark:hover:text-rose-400 transition-colors p-2 rounded-full hover:bg-rose-100/50 dark:hover:bg-slate-800" aria-label="Toggle Dark Mode">
+                <svg class="w-5 h-5 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                <svg class="w-5 h-5 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+            </button>
+            <a href="settings.html" class="text-slate-500 hover:text-rose-500 dark:text-slate-400 dark:hover:text-rose-400 font-medium transition-colors flex items-center gap-1 text-sm">
+                <span class="text-lg">⚙️</span> Settings
+            </a>
+        </div>
+
+        <!-- Header -->
+        <header class="text-center mb-10">
+            <h1 class="text-4xl md:text-5xl font-bold text-rose-500 dark:text-rose-400 mb-3 tracking-tight">FloraPulse</h1>
+            <p class="text-lg text-slate-600 dark:text-slate-300 font-medium">Your cycle. Your body. Your power.</p>
+        </header>
+
+        <!-- Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+            <!-- Card 1 -->
+            <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm hover:shadow-md transition-shadow p-6 flex flex-col border border-rose-100 dark:border-slate-700">
+                <div class="text-4xl mb-4 text-center">🌸</div>
+                <h2 class="text-xl font-semibold text-slate-800 dark:text-slate-100 mb-2 text-center">Ovulation Tracker</h2>
+                <p class="text-slate-600 dark:text-slate-300 text-center mb-6 flex-grow">Find your fertile window and ovulation days</p>
+                <a href="ovulation.html" class="block w-full text-center bg-rose-500 hover:bg-rose-600 dark:bg-rose-600 dark:hover:bg-rose-500 text-white font-medium py-3 px-4 rounded-xl transition-colors">
+                    Get Started &rarr;
+                </a>
+            </div>
+
+            <!-- Card 2 -->
+            <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm hover:shadow-md transition-shadow p-6 flex flex-col border border-rose-100 dark:border-slate-700">
+                <div class="text-4xl mb-4 text-center">🗓️</div>
+                <h2 class="text-xl font-semibold text-slate-800 dark:text-slate-100 mb-2 text-center">Period Predictor</h2>
+                <p class="text-slate-600 dark:text-slate-300 text-center mb-6 flex-grow">Know when your next period is coming</p>
+                <a href="period.html" class="block w-full text-center bg-rose-500 hover:bg-rose-600 dark:bg-rose-600 dark:hover:bg-rose-500 text-white font-medium py-3 px-4 rounded-xl transition-colors">
+                    Get Started &rarr;
+                </a>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm hover:shadow-md transition-shadow p-6 flex flex-col border border-rose-100 dark:border-slate-700">
+                <div class="text-4xl mb-4 text-center">👶</div>
+                <h2 class="text-xl font-semibold text-slate-800 dark:text-slate-100 mb-2 text-center">Pregnancy Calculator</h2>
+                <p class="text-slate-600 dark:text-slate-300 text-center mb-6 flex-grow">Calculate your estimated due date</p>
+                <a href="pregnancy.html" class="block w-full text-center bg-rose-500 hover:bg-rose-600 dark:bg-rose-600 dark:hover:bg-rose-500 text-white font-medium py-3 px-4 rounded-xl transition-colors">
+                    Get Started &rarr;
+                </a>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="mt-auto text-center pb-4">
+            <p class="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto leading-relaxed mb-2">
+                This tool is for planning purposes only and is not a substitute for medical advice.
+            </p>
+            <a href="privacy.html" class="text-xs text-rose-500 hover:text-rose-600 dark:text-rose-400 dark:hover:text-rose-300 transition-colors underline underline-offset-2">Privacy Policy</a>
+        </footer>
+    </div>
+
+    <!-- Onboarding Modal -->
+    <div id="onboardingModal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 dark:bg-slate-900/80 backdrop-blur-sm hidden opacity-0 transition-opacity duration-300">
+        <div class="bg-white dark:bg-slate-800 w-full max-w-sm mx-4 rounded-2xl shadow-xl overflow-hidden flex flex-col transform scale-95 transition-transform duration-300" id="onboardingContent">
+            <!-- Dynamic Content Container -->
+            <div id="tourStepContainer" class="p-8"></div>
+            <!-- Footer / Controls -->
+            <div class="bg-slate-50 dark:bg-slate-700/50 px-6 py-4 border-t border-slate-100 dark:border-slate-700 flex justify-between items-center">
+                <div class="flex gap-1.5" id="tourDots"></div>
+                <div class="flex gap-2">
+                    <button id="tourSkip" class="text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 text-sm font-medium px-3 py-2 transition-colors">Skip</button>
+                    <button id="tourNext" class="bg-rose-500 hover:bg-rose-600 dark:bg-rose-600 dark:hover:bg-rose-500 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors">Next</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Onboarding Tour Logic
+        const tourSteps = [
+            {
+                icon: "👋",
+                title: "Welcome to FloraPulse",
+                text: "Your personal, private cycle and fertility tracker. Let's take a quick tour of what you can do."
+            },
+            {
+                icon: "🌸",
+                title: "Ovulation Tracker",
+                text: "Enter your last period to find your fertile window, ovulation days, and safe sex days on a color-coded calendar."
+            },
+            {
+                icon: "🗓️",
+                title: "Period Predictor",
+                text: "Plan ahead! We'll predict your next 3 periods so you're never caught off guard."
+            },
+            {
+                icon: "👶",
+                title: "Pregnancy Calculator",
+                text: "Expecting? Calculate your Estimated Due Date (EDD) and track your trimester milestones."
+            },
+            {
+                icon: "🔒",
+                title: "100% Private",
+                text: "Your data never leaves your device. Everything is saved locally in your browser. You can also enable push notifications in Settings!"
+            }
+        ];
+        let currentStep = 0;
+
+        function renderStep() {
+            const step = tourSteps[currentStep];
+            document.getElementById('tourStepContainer').innerHTML = `
+                <div class="text-5xl mb-4 text-center">${step.icon}</div>
+                <h3 class="text-xl font-bold text-slate-800 dark:text-slate-100 mb-2 text-center">${step.title}</h3>
+                <p class="text-slate-600 dark:text-slate-300 text-center leading-relaxed text-sm">${step.text}</p>
+            `;
+            
+            const dotsHtml = tourSteps.map((_, i) => 
+                `<div class="w-2 h-2 rounded-full ${i === currentStep ? 'bg-rose-500' : 'bg-slate-300 dark:bg-slate-600'} transition-colors"></div>`
+            ).join('');
+            document.getElementById('tourDots').innerHTML = dotsHtml;
+
+            const nextBtn = document.getElementById('tourNext');
+            nextBtn.innerText = currentStep === tourSteps.length - 1 ? "Get Started" : "Next";
+        }
+
+        function closeTour() {
+            localStorage.setItem('hasSeenTour', 'true');
+            const modal = document.getElementById('onboardingModal');
+            const content = document.getElementById('onboardingContent');
+            modal.classList.add('opacity-0');
+            content.classList.add('scale-95');
+            setTimeout(() => modal.classList.add('hidden'), 300);
+        }
+
+        // Notification Check Logic
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize Tour
+            if (!localStorage.getItem('hasSeenTour')) {
+                const modal = document.getElementById('onboardingModal');
+                const content = document.getElementById('onboardingContent');
+                modal.classList.remove('hidden');
+                // trigger reflow
+                void modal.offsetWidth;
+                modal.classList.remove('opacity-0');
+                content.classList.remove('scale-95');
+                renderStep();
+
+                document.getElementById('tourNext').addEventListener('click', () => {
+                    if (currentStep < tourSteps.length - 1) {
+                        currentStep++;
+                        renderStep();
+                    } else {
+                        closeTour();
+                    }
+                });
+                document.getElementById('tourSkip').addEventListener('click', closeTour);
+            }
+
+            if (!('Notification' in window) || Notification.permission !== 'granted') return;
+            
+            const prefs = JSON.parse(localStorage.getItem('notificationPrefs') || '{}');
+            if (!prefs.period && !prefs.ovulation) return;
+
+            const lpdVal = localStorage.getItem('lastPeriodDate');
+            const cycleVal = localStorage.getItem('cycleLength');
+            if (!lpdVal || !cycleVal) return;
+
+            const cycleLength = parseInt(cycleVal, 10);
+            const [year, month, day] = lpdVal.split('-').map(Number);
+            let lpd = new Date(year, month - 1, day);
+            
+            const addDays = (date, days) => {
+                const result = new Date(date);
+                result.setDate(result.getDate() + days);
+                return result;
+            };
+
+            const today = new Date();
+            today.setHours(0,0,0,0);
+
+            let nextPeriod = addDays(lpd, cycleLength);
+            let ovulationDay = addDays(lpd, cycleLength - 14);
+            
+            // Fast forward to current/next cycle
+            while (nextPeriod < today) {
+                lpd = addDays(lpd, cycleLength);
+                nextPeriod = addDays(lpd, cycleLength);
+                ovulationDay = addDays(lpd, cycleLength - 14);
+            }
+
+            const ovWindowStart = addDays(ovulationDay, -2);
+            const periodReminderDate = addDays(nextPeriod, -2);
+
+            const lastNotifiedPeriod = localStorage.getItem('lastNotifiedPeriod');
+            const lastNotifiedOvulation = localStorage.getItem('lastNotifiedOvulation');
+
+            // Check Period (2 days before)
+            if (prefs.period && today.getTime() === periodReminderDate.getTime()) {
+                if (lastNotifiedPeriod !== periodReminderDate.toISOString()) {
+                    new Notification("FloraPulse", { 
+                        body: "Your period is expected to start in 2 days.",
+                        icon: "🌸"
+                    });
+                    localStorage.setItem('lastNotifiedPeriod', periodReminderDate.toISOString());
+                }
+            }
+
+            // Check Ovulation (Start of window)
+            if (prefs.ovulation && today.getTime() === ovWindowStart.getTime()) {
+                if (lastNotifiedOvulation !== ovWindowStart.toISOString()) {
+                    new Notification("FloraPulse", { 
+                        body: "Your fertile window starts today.",
+                        icon: "✨"
+                    });
+                    localStorage.setItem('lastNotifiedOvulation', ovWindowStart.toISOString());
+                }
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Period Predictor - FloraPulse</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+        }
+        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+        function toggleTheme() {
+            if (document.documentElement.classList.contains('dark')) {
+                document.documentElement.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+            } else {
+                document.documentElement.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-rose-50 dark:bg-slate-900 min-h-screen flex flex-col items-center py-8 px-4 transition-colors duration-200">
+    <div class="w-full max-w-[480px] md:max-w-2xl mx-auto flex-grow flex flex-col">
+        <!-- Top Navigation -->
+        <div class="w-full flex justify-between items-center mb-6">
+            <a href="index.html" class="text-rose-500 hover:text-rose-600 dark:text-rose-400 dark:hover:text-rose-300 font-medium inline-block transition-colors">&larr; Back to Home</a>
+            <button onclick="toggleTheme()" class="text-slate-500 hover:text-rose-500 dark:text-slate-400 dark:hover:text-rose-400 transition-colors p-2 rounded-full hover:bg-rose-100/50 dark:hover:bg-slate-800" aria-label="Toggle Dark Mode">
+                <svg class="w-5 h-5 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                <svg class="w-5 h-5 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+            </button>
+        </div>
+
+        <!-- Header -->
+        <header class="text-center mb-8">
+            <h1 class="text-3xl md:text-4xl font-bold text-rose-500 dark:text-rose-400 mb-2 tracking-tight">FloraPulse</h1>
+            <p class="text-slate-600 dark:text-slate-300 font-medium">Period Predictor</p>
+        </header>
+
+        <!-- Form Card -->
+        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm p-6 border border-rose-100 dark:border-slate-700 mb-8">
+            <form id="cycleForm" class="space-y-4">
+                <div>
+                    <label for="lastPeriod" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">First day of last period</label>
+                    <input type="date" id="lastPeriod" required class="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-xl focus:ring-2 focus:ring-rose-500 focus:border-rose-500 outline-none transition-all text-slate-700 dark:text-slate-200 color-scheme-light dark:[color-scheme:dark]">
+                </div>
+                <div>
+                    <label for="cycleLength" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Average cycle length (days)</label>
+                    <input type="number" id="cycleLength" value="28" min="20" max="45" required class="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-xl focus:ring-2 focus:ring-rose-500 focus:border-rose-500 outline-none transition-all text-slate-700 dark:text-slate-200">
+                </div>
+                <button type="submit" class="w-full bg-rose-500 hover:bg-rose-600 dark:bg-rose-600 dark:hover:bg-rose-500 text-white font-medium py-3 px-4 rounded-xl transition-colors mt-2">
+                    Predict My Period
+                </button>
+            </form>
+        </div>
+
+        <!-- Results Section -->
+        <div id="results" class="hidden space-y-4 mb-8">
+            <h3 class="text-xl font-semibold text-slate-800 dark:text-slate-100 mb-4 text-center">Your Next 3 Periods</h3>
+            
+            <!-- Prediction 1 -->
+            <div class="bg-rose-100 dark:bg-rose-900/30 rounded-2xl p-5 border border-rose-200 dark:border-rose-800/50 flex justify-between items-center shadow-sm transition-transform hover:-translate-y-1">
+                <div>
+                    <p class="text-xs text-rose-600 dark:text-rose-400 font-bold uppercase tracking-wider mb-1">Prediction 1</p>
+                    <p class="text-lg md:text-xl font-bold text-slate-800 dark:text-slate-100" id="date1"></p>
+                </div>
+                <div class="text-right">
+                    <span class="bg-white dark:bg-slate-800 text-rose-600 dark:text-rose-400 font-semibold px-3 py-1.5 rounded-full text-sm shadow-sm inline-block" id="days1"></span>
+                </div>
+            </div>
+
+            <!-- Prediction 2 -->
+            <div class="bg-rose-50 dark:bg-rose-900/20 rounded-2xl p-5 border border-rose-100 dark:border-rose-800/40 flex justify-between items-center shadow-sm transition-transform hover:-translate-y-1">
+                <div>
+                    <p class="text-xs text-rose-500 dark:text-rose-400 font-bold uppercase tracking-wider mb-1">Prediction 2</p>
+                    <p class="text-lg md:text-xl font-bold text-slate-800 dark:text-slate-100" id="date2"></p>
+                </div>
+                <div class="text-right">
+                    <span class="bg-white dark:bg-slate-800 text-rose-500 dark:text-rose-400 font-semibold px-3 py-1.5 rounded-full text-sm shadow-sm border border-rose-50 dark:border-slate-700 inline-block" id="days2"></span>
+                </div>
+            </div>
+
+            <!-- Prediction 3 -->
+            <div class="bg-white dark:bg-slate-800 rounded-2xl p-5 border border-rose-100 dark:border-slate-700 flex justify-between items-center shadow-sm transition-transform hover:-translate-y-1">
+                <div>
+                    <p class="text-xs text-rose-400 dark:text-rose-500 font-bold uppercase tracking-wider mb-1">Prediction 3</p>
+                    <p class="text-lg md:text-xl font-bold text-slate-800 dark:text-slate-100" id="date3"></p>
+                </div>
+                <div class="text-right">
+                    <span class="bg-rose-50 dark:bg-slate-700 text-rose-500 dark:text-rose-400 font-semibold px-3 py-1.5 rounded-full text-sm shadow-sm border border-rose-100 dark:border-slate-600 inline-block" id="days3"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="mt-auto text-center pt-8 pb-4">
+            <p class="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto leading-relaxed mb-2">
+                This tool is for planning purposes only and is not a substitute for medical advice.
+            </p>
+            <a href="privacy.html" class="text-xs text-rose-500 hover:text-rose-600 dark:text-rose-400 dark:hover:text-rose-300 transition-colors underline underline-offset-2">Privacy Policy</a>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('cycleForm');
+            const lpdInput = document.getElementById('lastPeriod');
+            const cycleInput = document.getElementById('cycleLength');
+
+            // Auto-load saved values
+            const savedLpd = localStorage.getItem('lastPeriodDate');
+            const savedCycle = localStorage.getItem('cycleLength');
+
+            if (savedLpd) lpdInput.value = savedLpd;
+            if (savedCycle) cycleInput.value = savedCycle;
+
+            if (savedLpd && savedCycle) {
+                calculateCycle();
+            }
+
+            form.addEventListener('submit', calculateCycle);
+        });
+
+        function calculateCycle(e) {
+            if (e) e.preventDefault();
+
+            const lpdVal = document.getElementById('lastPeriod').value;
+            const cycleVal = document.getElementById('cycleLength').value;
+
+            if (!lpdVal || !cycleVal) return;
+
+            const cycleLength = parseInt(cycleVal, 10);
+            
+            // Save to localStorage
+            localStorage.setItem('lastPeriodDate', lpdVal);
+            localStorage.setItem('cycleLength', cycleLength);
+
+            // Parse date safely (avoid timezone issues by explicitly using year, month, day)
+            const [year, month, day] = lpdVal.split('-').map(Number);
+            const lpd = new Date(year, month - 1, day);
+
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            // Format date helper (e.g., "15 April 2025")
+            const formatDate = (date) => {
+                return new Intl.DateTimeFormat(undefined, { 
+                    day: 'numeric', 
+                    month: 'long', 
+                    year: 'numeric' 
+                }).format(date);
+            };
+
+            // Calculate next 3 periods
+            for (let i = 1; i <= 3; i++) {
+                const nextDate = new Date(lpd);
+                nextDate.setDate(nextDate.getDate() + (cycleLength * i));
+                
+                // Calculate days away
+                const diffTime = nextDate - today;
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                
+                let daysText = "";
+                if (diffDays === 0) {
+                    daysText = "Today";
+                } else if (diffDays === 1) {
+                    daysText = "Tomorrow";
+                } else if (diffDays === -1) {
+                    daysText = "Yesterday";
+                } else if (diffDays < 0) {
+                    daysText = `${Math.abs(diffDays)} days ago`;
+                } else {
+                    daysText = `in ${diffDays} days`;
+                }
+
+                // Update DOM
+                document.getElementById(`date${i}`).innerText = formatDate(nextDate);
+                document.getElementById(`days${i}`).innerText = daysText;
+            }
+
+            // Show results
+            document.getElementById('results').classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pregnancy Calculator - FloraPulse</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+        }
+        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+        function toggleTheme() {
+            if (document.documentElement.classList.contains('dark')) {
+                document.documentElement.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+            } else {
+                document.documentElement.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-rose-50 dark:bg-slate-900 min-h-screen flex flex-col items-center py-8 px-4 transition-colors duration-200">
+    <div class="w-full max-w-[480px] md:max-w-2xl mx-auto flex-grow flex flex-col">
+        <!-- Top Navigation -->
+        <div class="w-full flex justify-between items-center mb-6">
+            <a href="index.html" class="text-rose-500 hover:text-rose-600 dark:text-rose-400 dark:hover:text-rose-300 font-medium inline-block transition-colors">&larr; Back to Home</a>
+            <button onclick="toggleTheme()" class="text-slate-500 hover:text-rose-500 dark:text-slate-400 dark:hover:text-rose-400 transition-colors p-2 rounded-full hover:bg-rose-100/50 dark:hover:bg-slate-800" aria-label="Toggle Dark Mode">
+                <svg class="w-5 h-5 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                <svg class="w-5 h-5 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+            </button>
+        </div>
+
+        <!-- Header -->
+        <header class="text-center mb-8">
+            <h1 class="text-3xl md:text-4xl font-bold text-rose-500 dark:text-rose-400 mb-2 tracking-tight">FloraPulse</h1>
+            <p class="text-slate-600 dark:text-slate-300 font-medium">Pregnancy Calculator</p>
+        </header>
+
+        <!-- Form Card -->
+        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm p-6 border border-rose-100 dark:border-slate-700 mb-8">
+            <form id="eddForm" class="space-y-4">
+                <div>
+                    <label for="lmpDate" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">First day of your last period (LMP)</label>
+                    <input type="date" id="lmpDate" required class="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-xl focus:ring-2 focus:ring-rose-500 focus:border-rose-500 outline-none transition-all text-slate-700 dark:text-slate-200 color-scheme-light dark:[color-scheme:dark]">
+                </div>
+                <button type="submit" class="w-full bg-rose-500 hover:bg-rose-600 dark:bg-rose-600 dark:hover:bg-rose-500 text-white font-medium py-3 px-4 rounded-xl transition-colors mt-2">
+                    Calculate Due Date
+                </button>
+            </form>
+        </div>
+
+        <!-- Results Section -->
+        <div id="results" class="hidden space-y-8 mb-8">
+            
+            <!-- EDD Display -->
+            <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm p-6 border border-rose-100 dark:border-slate-700 text-center">
+                <p class="text-sm text-slate-500 dark:text-slate-400 font-bold mb-2 uppercase tracking-wider">Estimated Due Date</p>
+                <p class="text-3xl md:text-4xl font-bold text-rose-600 dark:text-rose-400 mb-6" id="resEdd"></p>
+                
+                <div class="bg-rose-50 dark:bg-rose-900/20 rounded-xl p-4 border border-rose-100 dark:border-rose-800/40 inline-block w-full">
+                    <p class="text-lg font-bold text-slate-800 dark:text-slate-100 mb-1" id="resWeek"></p>
+                    <p class="text-sm text-slate-600 dark:text-slate-300 font-medium" id="resTrimester"></p>
+                </div>
+            </div>
+
+            <!-- Milestones -->
+            <div>
+                <h3 class="text-xl font-semibold text-slate-800 dark:text-slate-100 mb-4 text-center">Pregnancy Milestones</h3>
+                
+                <div class="space-y-3">
+                    <!-- Trimester 1 -->
+                    <div class="bg-white dark:bg-slate-800 rounded-2xl p-5 border border-rose-100 dark:border-slate-700 flex justify-between items-center shadow-sm transition-transform hover:-translate-y-1">
+                        <div>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider mb-1">Week 12</p>
+                            <p class="text-base md:text-lg font-bold text-slate-800 dark:text-slate-100">End of Trimester 1</p>
+                        </div>
+                        <div class="text-right">
+                            <span class="bg-rose-50 dark:bg-slate-700 text-rose-600 dark:text-rose-400 font-semibold px-3 py-1.5 rounded-full text-sm shadow-sm border border-rose-100 dark:border-slate-600 inline-block" id="dateTri1"></span>
+                        </div>
+                    </div>
+
+                    <!-- Trimester 2 -->
+                    <div class="bg-white dark:bg-slate-800 rounded-2xl p-5 border border-rose-100 dark:border-slate-700 flex justify-between items-center shadow-sm transition-transform hover:-translate-y-1">
+                        <div>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider mb-1">Week 27</p>
+                            <p class="text-base md:text-lg font-bold text-slate-800 dark:text-slate-100">End of Trimester 2</p>
+                        </div>
+                        <div class="text-right">
+                            <span class="bg-rose-50 dark:bg-slate-700 text-rose-600 dark:text-rose-400 font-semibold px-3 py-1.5 rounded-full text-sm shadow-sm border border-rose-100 dark:border-slate-600 inline-block" id="dateTri2"></span>
+                        </div>
+                    </div>
+
+                    <!-- Trimester 3 / EDD -->
+                    <div class="bg-rose-50 dark:bg-rose-900/30 rounded-2xl p-5 border border-rose-200 dark:border-rose-800/50 flex justify-between items-center shadow-sm transition-transform hover:-translate-y-1">
+                        <div>
+                            <p class="text-xs text-rose-500 dark:text-rose-400 font-bold uppercase tracking-wider mb-1">Week 40</p>
+                            <p class="text-base md:text-lg font-bold text-rose-700 dark:text-rose-300">Estimated Due Date</p>
+                        </div>
+                        <div class="text-right">
+                            <span class="bg-white dark:bg-slate-800 text-rose-600 dark:text-rose-400 font-semibold px-3 py-1.5 rounded-full text-sm shadow-sm inline-block" id="dateTri3"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="mt-auto text-center pt-8 pb-4">
+            <p class="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto leading-relaxed mb-2">
+                Your EDD is an estimate. Only your doctor can confirm your due date.
+            </p>
+            <a href="privacy.html" class="text-xs text-rose-500 hover:text-rose-600 dark:text-rose-400 dark:hover:text-rose-300 transition-colors underline underline-offset-2">Privacy Policy</a>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('eddForm');
+            const lmpInput = document.getElementById('lmpDate');
+
+            // Auto-load saved values
+            const savedLmp = localStorage.getItem('eddLMPDate');
+
+            if (savedLmp) {
+                lmpInput.value = savedLmp;
+                calculatePregnancy();
+            }
+
+            form.addEventListener('submit', calculatePregnancy);
+        });
+
+        function calculatePregnancy(e) {
+            if (e) e.preventDefault();
+
+            const lmpVal = document.getElementById('lmpDate').value;
+            if (!lmpVal) return;
+
+            // Save to localStorage
+            localStorage.setItem('eddLMPDate', lmpVal);
+
+            // Parse date safely
+            const [year, month, day] = lmpVal.split('-').map(Number);
+            const lmp = new Date(year, month - 1, day);
+            
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            const addDays = (date, days) => {
+                const result = new Date(date);
+                result.setDate(result.getDate() + days);
+                return result;
+            };
+
+            const formatDate = (date) => {
+                return new Intl.DateTimeFormat(undefined, { 
+                    day: 'numeric', 
+                    month: 'long', 
+                    year: 'numeric' 
+                }).format(date);
+            };
+
+            // Core Calculations
+            const edd = addDays(lmp, 280); // 40 weeks
+            const tri1End = addDays(lmp, 84); // 12 weeks
+            const tri2End = addDays(lmp, 189); // 27 weeks
+
+            // Calculate current week
+            const diffTime = today - lmp;
+            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+            let currentWeek = Math.floor(diffDays / 7);
+
+            // Handle edge cases for current week
+            if (currentWeek < 0) currentWeek = 0;
+
+            // Determine Trimester
+            let trimesterText = "";
+            if (currentWeek < 13) {
+                trimesterText = "Trimester 1 🌱 — Baby is forming";
+            } else if (currentWeek < 28) {
+                trimesterText = "Trimester 2 🌷 — You may start to show";
+            } else {
+                trimesterText = "Trimester 3 🌸 — Almost there!";
+            }
+
+            // Update DOM Results
+            document.getElementById('resEdd').innerText = formatDate(edd);
+            
+            if (currentWeek > 42) {
+                document.getElementById('resWeek').innerText = "You have reached your due date!";
+                document.getElementById('resTrimester').innerText = "Congratulations! 🎉";
+            } else {
+                document.getElementById('resWeek').innerText = `You are ${currentWeek} weeks pregnant`;
+                document.getElementById('resTrimester').innerText = trimesterText;
+            }
+
+            document.getElementById('dateTri1').innerText = formatDate(tri1End);
+            document.getElementById('dateTri2').innerText = formatDate(tri2End);
+            document.getElementById('dateTri3').innerText = formatDate(edd);
+
+            // Show results
+            document.getElementById('results').classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
